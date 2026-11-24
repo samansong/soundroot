@@ -1,0 +1,32 @@
+{
+  "name": "soundroot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SoundRoot — the operating system for African music production (MVP).",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "predev": "node --disable-warning=ExperimentalWarning scripts/seed.ts --if-empty",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "seed": "node --disable-warning=ExperimentalWarning scripts/seed.ts",
+    "reset": "node -e \"require('fs').rmSync('data',{recursive:true,force:true})\" && npm run seed",
+    "test": "node --disable-warning=ExperimentalWarning --test tests/acceptance.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "next": "^16.4.6",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^7.0.2"
+  },
+  "type": "module"
+}
