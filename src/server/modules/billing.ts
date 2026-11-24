@@ -170,7 +170,9 @@ export function sandboxAuthorize(providerRef: string, outcome: "succeed" | "fail
     data: { reference: providerRef, amount: p.amount_minor, currency: p.currency, channel: p.method, fee: bps(p.amount_minor, PROVIDER_FEE_BPS) },
   };
   // The provider delivers webhooks asynchronously with retries (durable queue).
-  enqueue("deliver_webhook", { url: `${origin}/api/v1/webhooks/payments`, body: JSON.stringify(event) });
+  // Behind a reverse proxy, deliver straight to the app (INTERNAL_URL) so no HTTP->HTTPS redirect drops the POST.
+  const base = process.env.INTERNAL_URL || origin;
+  enqueue("deliver_webhook", { url: `${base}/api/v1/webhooks/payments`, body: JSON.stringify(event) });
   return { eventId: event.id };
 }
 

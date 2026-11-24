@@ -1,0 +1,25 @@
+[Unit]
+Description=SoundRoot (Next.js app + job worker)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=soundroot
+Group=soundroot
+WorkingDirectory=/opt/soundroot
+EnvironmentFile=/etc/soundroot/soundroot.env
+Environment=NODE_ENV=production
+# Listen on localhost only; Caddy terminates HTTPS in front of it.
+ExecStart=/usr/bin/node /opt/soundroot/node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3000
+Restart=always
+RestartSec=5
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/soundroot /var/backups/soundroot
+
+[Install]
+WantedBy=multi-user.target

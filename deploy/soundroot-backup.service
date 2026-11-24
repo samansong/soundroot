@@ -1,0 +1,10 @@
+[Unit]
+Description=SoundRoot backup (database + audio storage)
+
+[Service]
+Type=oneshot
+User=soundroot
+Group=soundroot
+WorkingDirectory=/opt/soundroot
+EnvironmentFile=/etc/soundroot/soundroot.env
+ExecStart=/usr/bin/node /opt/soundroot/scripts/backup.ts

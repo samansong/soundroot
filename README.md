@@ -75,6 +75,10 @@ src/
 
 `/pay/[ref]` simulates a licensed PSP's hosted checkout (MoMo / card, **test mode**). Approving it makes the "provider" enqueue a **signed webhook**, which the worker delivers to `/api/v1/webhooks/payments` with exponential-backoff retries. To go live, swap `sandboxAuthorize` and the hosted page for your chosen provider's checkout. The webhook handler, ledger and fulfilment code stay the same.
 
+## Deploying
+
+To run SoundRoot on a VPS behind your own domain (HTTPS, systemd, daily backups), see [DEPLOY.md](DEPLOY.md).
+
 ## Going to production
 
 The dev setup uses zero-dependency building blocks that map one-to-one onto the spec's production stack:
