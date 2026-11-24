@@ -2,7 +2,8 @@ import Link from "next/link";
 import { searchBeats } from "@/server/modules/catalog";
 import { listStudios } from "@/server/modules/studio";
 import { BeatCard } from "@/components/beats";
-import { HeroOrb } from "./HeroOrb";
+import Image from "next/image";
+import { HeroPlayer } from "./HeroPlayer";
 import { ArtworkSvg } from "@/components/Artwork";
 import { IconArrow, IconPin } from "@/components/icons";
 import { getActor } from "@/server/session";
@@ -16,10 +17,12 @@ export default async function Home() {
   const genres = ["Afrobeats", "Amapiano", "Highlife", "Asakaa Drill", "Hiplife", "Gospel", "Afro House", "Afro Soul", "Azonto", "Alté", "Afro-fusion", "Bongo"];
   return (
     <div className="page stack xl">
-      <section className="hero">
-        <div className="fade-up">
-          <div className="eyebrow">Made in Accra · Built for the continent</div>
-          <h1 style={{ marginTop: 18 }}>
+      <section className="hero-stage fade-up">
+        <Image src="/images/hero-listener.jpg" alt="" fill priority sizes="(max-width: 900px) 100vw, 1360px" className="hero-photo" />
+        <div className="hero-veil" aria-hidden />
+        <div className="hero-copy">
+          <div className="glass-chip">Made in Accra · Built for the continent</div>
+          <h1 style={{ marginTop: 20 }}>
             Where African<br />music gets <span className="gradient-text">made.</span>
           </h1>
           <p className="lede">
@@ -27,15 +30,32 @@ export default async function Home() {
           </p>
           <div className="row wrap" style={{ marginTop: 30, gap: 12 }}>
             <Link href="/beats" className="btn btn-primary btn-lg">Explore beats <IconArrow /></Link>
-            <Link href="/studios" className="btn btn-lg">Book a studio</Link>
+            <Link href="/studios" className="btn btn-glass btn-lg">Book a studio</Link>
           </div>
-          <div className="row wrap muted small" style={{ marginTop: 28, gap: 22 }}>
-            <span><b className="gold" style={{ fontSize: "1.2rem" }}>{popular.total}</b> beats ready to license</span>
-            <span><b className="teal" style={{ fontSize: "1.2rem" }}>MoMo</b> & card payments</span>
-            <span><b style={{ fontSize: "1.2rem", color: "var(--plum)" }}>0%</b> fees on your own clients</span>
+          <div className="glass-pane hero-stats">
+            {popular.total > 0 && <span><b className="gold">{popular.total}</b> beats ready to license</span>}
+            <span><b className="teal">MoMo</b> & card payments</span>
+            <span><b style={{ color: "var(--plum)" }}>0%</b> fees on your own clients</span>
           </div>
         </div>
-        {featured && <HeroOrb beat={featured} />}
+        {featured && <HeroPlayer beat={featured} />}
+      </section>
+
+      <section className="scenes">
+        {[
+          { img: "/images/scene-rooftop.jpg", k: "Listen", t: "Find the sound that moves you", href: "/beats", pos: "center" },
+          { img: "/images/scene-producer.jpg", k: "Create", t: "Sell your beats with clear licenses", href: actor ? "/producer" : "/signup", pos: "68% center" },
+          { img: "/images/scene-vocalist.jpg", k: "Record", t: "Book a room, deliver the master", href: "/studios", pos: "42% center" },
+        ].map((c, i) => (
+          <Link key={c.k} href={c.href} className="scene-card fade-up" style={{ animationDelay: `${120 + i * 90}ms` }}>
+            <Image src={c.img} alt="" fill sizes="(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 440px" className="scene-photo" style={{ objectPosition: c.pos }} />
+            <div className="glass-pane scene-caption">
+              <div className="eyebrow">{c.k}</div>
+              <div className="scene-title">{c.t}</div>
+              <span className="scene-go" aria-hidden><IconArrow width={16} /></span>
+            </div>
+          </Link>
+        ))}
       </section>
 
       <div className="marquee" aria-hidden>

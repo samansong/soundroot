@@ -454,3 +454,90 @@ p { margin: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }
+
+/* ---------- Glass (frosted panes over photography) */
+.glass-pane {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(22px) saturate(170%);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -1px 0 rgba(255, 255, 255, 0.04), 0 24px 60px -24px rgba(0, 0, 0, 0.7);
+  border-radius: 22px;
+}
+.glass-chip {
+  display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 999px;
+  font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; color: var(--gold-2);
+  background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+.btn-glass {
+  background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+.btn-glass:hover { background: rgba(255, 255, 255, 0.18); }
+
+/* ---------- Photo hero */
+.hero-stage {
+  position: relative; isolation: isolate; overflow: hidden; border-radius: 32px;
+  min-height: min(80vh, 760px); display: grid; align-items: center;
+  padding: clamp(28px, 5vw, 64px); border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 40px 120px -40px rgba(0, 0, 0, 0.8);
+}
+.hero-photo { object-fit: cover; object-position: 70% center; z-index: -2; transform: scale(1.04); animation: hero-drift 24s ease-in-out infinite alternate; }
+.hero-veil {
+  position: absolute; inset: 0; z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(7, 13, 16, 0.92) 0%, rgba(7, 13, 16, 0.7) 32%, rgba(7, 13, 16, 0.15) 62%, rgba(7, 13, 16, 0.05) 100%),
+    linear-gradient(0deg, rgba(7, 13, 16, 0.75) 0%, transparent 35%);
+}
+.hero-copy { max-width: 600px; position: relative; z-index: 1; }
+.hero-copy h1 { font-size: clamp(2.6rem, 6vw, 5.4rem); line-height: 0.98; letter-spacing: -0.035em; text-shadow: 0 4px 40px rgba(0, 0, 0, 0.4); }
+.hero-copy .lede { font-size: 1.15rem; color: rgba(238, 244, 242, 0.82); max-width: 540px; margin-top: 22px; }
+.hero-stats { display: inline-flex; flex-wrap: wrap; max-width: min(100%, 470px); gap: 6px 22px; margin-top: 30px; padding: 14px 22px; font-size: 0.86rem; color: rgba(255, 255, 255, 0.78); border-radius: 18px; }
+.hero-stats b { font-size: 1.15rem; margin-right: 4px; }
+.hero-player {
+  position: absolute; right: clamp(20px, 3vw, 40px); bottom: clamp(20px, 3vw, 40px);
+  display: grid; grid-template-columns: auto minmax(0, 1fr) 84px; align-items: center; gap: 16px;
+  width: min(420px, calc(100% - 40px)); padding: 14px 18px 14px 14px; border-radius: 24px;
+}
+.hp-btn {
+  width: 56px; height: 56px; border-radius: 50%; border: none; cursor: pointer; display: grid; place-items: center;
+  background: radial-gradient(circle at 35% 30%, #fff, #f6e8c9 60%, #e9c27a); color: #1b1305;
+  box-shadow: 0 0 40px rgba(242, 184, 75, 0.45); transition: transform 0.2s;
+}
+.hp-btn:hover { transform: scale(1.06); }
+.hp-btn svg { width: 22px; height: 22px; }
+.hp-title { display: block; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hp-spectrum { width: 84px; height: 40px; }
+@keyframes hero-drift { from { transform: scale(1.04) translate3d(0, 0, 0); } to { transform: scale(1.1) translate3d(-1.2%, -0.8%, 0); } }
+
+/* ---------- Scene cards */
+.scenes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.scene-card {
+  position: relative; isolation: isolate; overflow: hidden; border-radius: 26px; aspect-ratio: 4 / 5;
+  display: flex; align-items: flex-end; padding: 14px; border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 30px 80px -40px rgba(0, 0, 0, 0.9);
+}
+.scene-card::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, rgba(7, 13, 16, 0.55), transparent 45%); }
+.scene-photo { object-fit: cover; z-index: -2; transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.scene-card:hover .scene-photo { transform: scale(1.06); }
+.scene-caption { position: relative; width: 100%; padding: 16px 56px 16px 18px; border-radius: 18px; }
+.scene-title { font-family: var(--font-display); font-weight: 650; font-size: 1.12rem; line-height: 1.25; margin-top: 6px; }
+.scene-go {
+  position: absolute; right: 14px; top: 50%; translate: 0 -50%; width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center; background: rgba(255, 255, 255, 0.16); border: 1px solid rgba(255, 255, 255, 0.24); transition: background 0.3s, transform 0.3s;
+}
+.scene-card:hover .scene-go { background: var(--gold); color: #1b1305; transform: translateX(3px); }
+
+@media (max-width: 1100px) { .scenes { grid-template-columns: repeat(2, minmax(0, 1fr)); } .scenes .scene-card:last-child { grid-column: span 2; aspect-ratio: 16 / 9; } }
+@media (max-width: 900px) {
+  .hero-stage { min-height: auto; align-items: end; padding: 28px 22px 22px; border-radius: 26px; }
+  .hero-photo { inset: 0 0 auto 0 !important; height: 380px !important; object-position: 74% 30%; }
+  .hero-veil { background: linear-gradient(180deg, rgba(7, 13, 16, 0) 0px, rgba(7, 13, 16, 0.15) 200px, rgba(7, 13, 16, 0.92) 360px, rgb(9, 17, 20) 420px); }
+  .hero-copy { padding-top: 250px; }
+  .hero-player { position: relative; right: auto; bottom: auto; width: 100%; margin-top: 18px; }
+}
+@media (max-width: 680px) { .scenes { grid-template-columns: 1fr; } .scenes .scene-card:last-child { grid-column: auto; aspect-ratio: 4 / 5; } }
+@media (prefers-reduced-motion: reduce) { .hero-photo { animation: none; } }
