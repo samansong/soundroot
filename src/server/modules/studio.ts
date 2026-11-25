@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import { queueInviteEmail } from "../email/send.ts";
 import { z } from "zod";
 import { addMinutes, all, insert, now, one, run, tx, uuid } from "../db.ts";
-import { type Actor, loadActor, membershipFor, requireActor, requireStudio } from "../auth.ts";
+import { type Actor, loadActor, membershipFor, requireActor, requireStudio, requireVerified } from "../auth.ts";
 import { badRequest, conflict, forbidden, notFound } from "../errors.ts";
 import { audit, notify } from "../audit.ts";
 import { bps, BOOKING_COMMISSION_BPS, formatMoney } from "../money.ts";
@@ -107,7 +107,7 @@ export const bookingInput = z.object({
 });
 
 export function createBookingHold(actorIn: Actor | null, input: unknown) {
-  const actor = requireActor(actorIn);
+  const actor = requireVerified(actorIn);
   const d = bookingInput.parse(input);
   return tx(() => {
     const s = one("SELECT * FROM studios WHERE id=?", d.studioId);

@@ -221,3 +221,35 @@ test("Refund and dispute: correct status, ledger adjustments and access revoked"
   const net = one("SELECT SUM(amount_minor) v FROM ledger_entries WHERE order_id=? AND entry_type IN ('collected','collected_refund')", order).v;
   assert.equal(net, 0);
 });
+
+test("Email verification: sign-ups must confirm their email before money actions", async () => {
+  const identity = await import("../src/server/modules/identity.ts");
+  const { issueVerificationToken } = await import("../src/server/email/verification-token.ts");
+  const { userId } = identity.signup({ email: "newbie@soundroot.test", name: "New Bie", password: pw, roles: ["artist", "beatmaker"] });
+  let a = loadActor(userId)!;
+  assert.equal(a.emailVerified, false);
+  // Welcome email (with the link) is queued; the worker mints the token at send time.
+  assert.ok(one("SELECT 1 FROM jobs WHERE type='send_email' AND payload LIKE ?", `%"welcome"%${userId}%`));
+  await drain();
+  assert.equal(one("SELECT COUNT(*) n FROM email_verifications WHERE user_id=?", userId).n, 1);
+  // Money actions are refused until verified.
+  assert.throws(() => billing.createBeatOrder(a, {}), (e: any) => e instanceof AppError && e.code === "email_unverified");
+  assert.throws(() => studio.createBookingHold(a, {}), (e: any) => e instanceof AppError && e.code === "email_unverified");
+  assert.throws(() => billing.requestPayout(a), (e: any) => e instanceof AppError && e.code === "email_unverified");
+  // Resend is rate limited (a link was just sent).
+  rejects(() => identity.resendVerification(a), 429);
+  // Bad and expired links do nothing.
+  assert.equal(identity.verifyEmail("not-a-real-token-but-long-enough").status, "invalid");
+  const old = issueVerificationToken(userId);
+  run("UPDATE email_verifications SET expires_at=? WHERE token_hash=(SELECT token_hash FROM email_verifications WHERE user_id=? ORDER BY created_at DESC LIMIT 1)", "2000-01-01T00:00:00.000Z", userId);
+  assert.equal(identity.verifyEmail(old.path.split("/").pop()!).status, "expired");
+  // A valid link verifies once; reuse reports "already".
+  const link = issueVerificationToken(userId);
+  const token = link.path.split("/").pop()!;
+  assert.equal(identity.verifyEmail(token).status, "verified");
+  assert.equal(identity.verifyEmail(token).status, "already");
+  a = loadActor(userId)!;
+  assert.equal(a.emailVerified, true);
+  assert.ok(one("SELECT 1 FROM audit_events WHERE action='user.email_verified' AND resource_id=?", userId));
+  assert.deepEqual(identity.resendVerification(a), { alreadyVerified: true });
+});

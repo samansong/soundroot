@@ -7,6 +7,7 @@ import { IconBag, IconBell, IconChart, IconFolder, IconGrid, IconHome, IconLogou
 import { PlayerBar } from "./PlayerBar";
 import { api, Avatar, ToastProvider } from "./ui";
 import { Ambient } from "./visuals";
+import { VerifyBanner } from "./VerifyBanner";
 
 type Notif = { id: string; title: string; body: string; link: string | null; read_at: string | null; created_at: string };
 
@@ -48,6 +49,7 @@ export function Shell({ actor, children }: { actor: Actor | null; children: Reac
         </aside>
         <div className="main">
           <TopBar actor={actor} />
+          {actor && !actor.emailVerified && !path.startsWith("/verify-email") && <VerifyBanner email={actor.email} />}
           {children}
         </div>
       </div>

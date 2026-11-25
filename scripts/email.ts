@@ -3,11 +3,12 @@
 //   node scripts/email.ts test --to you@example.com  Send one of each template through Resend (needs RESEND_API_KEY).
 import fs from "node:fs";
 import path from "node:path";
-import { inviteEmail, notificationEmail, welcomeEmail } from "../src/server/email/templates.ts";
+import { inviteEmail, notificationEmail, verifyEmail, welcomeEmail } from "../src/server/email/templates.ts";
 import { deliver } from "../src/server/email/send.ts";
 
 const samples = {
-  "welcome-artist": welcomeEmail({ name: "Ama Mensah", roles: ["artist"] }),
+  "welcome-artist": welcomeEmail({ name: "Ama Mensah", roles: ["artist"], verify: { path: "/verify-email/sample-token", expiresInHours: 48 } }),
+  "verify": verifyEmail({ name: "Ama Mensah", path: "/verify-email/sample-token", expiresInHours: 48 }),
   "welcome-beatmaker": welcomeEmail({ name: "Kofi Sound", roles: ["beatmaker"] }),
   "welcome-studio": welcomeEmail({ name: "Efua Owusu", roles: ["studio_owner"] }),
   "sale": notificationEmail({ name: "Kofi Sound", type: "sale", title: "You made a sale 🎉", body: "Midnight in Osu — Premium lease · GHS 450.00", link: "/producer" }),

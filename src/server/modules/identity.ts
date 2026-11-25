@@ -1,9 +1,10 @@
+import crypto from "node:crypto";
 // Identity module: signup, login, roles, profile bootstrap, notifications, data export.
 import { z } from "zod";
 import { all, insert, now, one, run, uuid } from "../db.ts";
 import { type Actor, type Role, createSession, newUser, requireActor, verifyPassword } from "../auth.ts";
-import { queueWelcomeEmail } from "../email/send.ts";
-import { badRequest, conflict, unauthorized } from "../errors.ts";
+import { queueVerificationEmail, queueWelcomeEmail } from "../email/send.ts";
+import { AppError, badRequest, conflict, unauthorized } from "../errors.ts";
 import { audit } from "../audit.ts";
 import { ensureProducerProfile } from "./catalog.ts";
 
@@ -20,8 +21,8 @@ export const signupSchema = z.object({
 export function signup(input: unknown) {
   const d = signupSchema.parse(input);
   if (one("SELECT 1 FROM users WHERE email=?", d.email.toLowerCase())) throw conflict("An account with this email already exists");
-  const userId = newUser({ email: d.email, name: d.name, phone: d.phone || undefined, password: d.password, roles: d.roles as Role[] });
-  const actor = { id: userId, name: d.name, email: d.email, roles: d.roles as Role[], producerId: null, memberships: [] } as Actor;
+  const userId = newUser({ email: d.email, name: d.name, phone: d.phone || undefined, password: d.password, roles: d.roles as Role[], verified: false });
+  const actor = { id: userId, name: d.name, email: d.email, emailVerified: false, roles: d.roles as Role[], producerId: null, memberships: [] } as Actor;
   if (d.roles.includes("beatmaker")) ensureProducerProfile(actor, d.name);
   if (d.roles.includes("studio_owner")) {
     const name = d.studioName?.trim() || `${d.name}'s Studio`;
@@ -86,4 +87,33 @@ export function exportMyData(actorIn: Actor | null) {
     comments: all("SELECT body, timestamp_ms, created_at FROM comments WHERE author_id=?", actor.id),
     exportedAt: now(),
   };
+}
+
+// ---------------------------------------------------------------- Email verification
+
+const sha = (t: string) => crypto.createHash("sha256").update(t).digest("hex");
+
+export type VerifyResult = { status: "verified" | "already" | "expired" | "invalid"; name?: string; email?: string };
+
+export function verifyEmail(token: string): VerifyResult {
+  if (!/^[A-Za-z0-9_-]{20,100}$/.test(token)) return { status: "invalid" };
+  const v = one("SELECT v.*, u.email_verified_at, u.name, u.email FROM email_verifications v JOIN users u ON u.id=v.user_id WHERE v.token_hash=?", sha(token));
+  if (!v) return { status: "invalid" };
+  if (v.email_verified_at) return { status: "already", name: v.name, email: v.email };
+  if (v.used_at || v.expires_at < now()) return { status: "expired", name: v.name, email: v.email };
+  run("UPDATE users SET email_verified_at=? WHERE id=? AND email_verified_at IS NULL", now(), v.user_id);
+  run("UPDATE email_verifications SET used_at=? WHERE user_id=? AND used_at IS NULL", now(), v.user_id);
+  audit(v.user_id, "user.email_verified", "user", v.user_id);
+  return { status: "verified", name: v.name, email: v.email };
+}
+
+/** Re-sends the link. Limited to one per minute and five per day per account. */
+export function resendVerification(actorIn: Actor | null) {
+  const actor = requireActor(actorIn);
+  if (actor.emailVerified) return { alreadyVerified: true };
+  const recent = all("SELECT created_at FROM email_verifications WHERE user_id=? AND created_at > ? ORDER BY created_at DESC", actor.id, new Date(Date.now() - 86400_000).toISOString());
+  if (recent[0] && Date.parse(recent[0].created_at) > Date.now() - 60_000) throw new AppError(429, "rate_limited", "We just sent a link — give it a minute before asking for another.");
+  if (recent.length >= 5) throw new AppError(429, "rate_limited", "Too many verification emails today. Check your spam folder, or try again tomorrow.");
+  queueVerificationEmail(actor.id);
+  return { sent: true, email: actor.email };
 }

@@ -3,7 +3,8 @@
 // Without RESEND_API_KEY (local dev, tests) emails are logged instead of sent.
 import { one } from "../db.ts";
 import { enqueue, registerJob } from "../queue.ts";
-import { inviteEmail, notificationEmail, welcomeEmail, type Rendered } from "./templates.ts";
+import { inviteEmail, notificationEmail, verifyEmail, welcomeEmail, type Rendered } from "./templates.ts";
+import { issueVerificationToken } from "./verification-token.ts";
 
 const FROM = () => process.env.EMAIL_FROM || "SoundzRoot <notice@soundzroot.com>";
 const REPLY_TO = () => process.env.EMAIL_REPLY_TO || undefined;
@@ -11,6 +12,7 @@ const REPLY_TO = () => process.env.EMAIL_REPLY_TO || undefined;
 type Job =
   | { kind: "notification"; key: string; userId: string; type: string; title: string; body: string; link?: string | null }
   | { kind: "welcome"; key: string; userId: string }
+  | { kind: "verify"; key: string; userId: string }
   | { kind: "invite"; key: string; to: string; studioName: string; inviterName: string; role: string; path: string; expiresInHours: number };
 
 export function queueNotificationEmail(key: string, userId: string, type: string, title: string, body: string, link?: string | null) {
@@ -18,6 +20,9 @@ export function queueNotificationEmail(key: string, userId: string, type: string
 }
 export function queueWelcomeEmail(userId: string) {
   enqueue("send_email", { kind: "welcome", key: `welcome-${userId}`, userId } satisfies Job);
+}
+export function queueVerificationEmail(userId: string) {
+  enqueue("send_email", { kind: "verify", key: `verify-${userId}-${Date.now()}`, userId } satisfies Job);
 }
 export function queueInviteEmail(j: Omit<Extract<Job, { kind: "invite" }>, "kind">) {
   enqueue("send_email", { kind: "invite", ...j } satisfies Job);
@@ -28,15 +33,21 @@ function recipient(userId: string) {
   return (u ?? null) as { id: string; email: string; name: string } | null;
 }
 
-function render(job: Job): { to: string; mail: Rendered } | null {
-  if (job.kind === "invite") return { to: job.to, mail: inviteEmail(job) };
+function render(job: Job): { to: string; mail: Rendered; key: string } | null {
+  if (job.kind === "invite") return { to: job.to, mail: inviteEmail(job), key: job.key };
   const u = recipient(job.userId);
   if (!u) return null;
-  if (job.kind === "welcome") {
+  if (job.kind === "welcome" || job.kind === "verify") {
+    // The link token is minted at send time so the plain token never sits in the jobs table.
+    const verified = !!one("SELECT email_verified_at v FROM users WHERE id=?", u.id)?.v;
+    if (job.kind === "verify" && verified) return null;
+    const link = verified ? null : issueVerificationToken(u.id);
+    const key = link ? `${job.key}-${link.key}` : job.key;
+    if (job.kind === "verify") return { to: u.email, mail: verifyEmail({ name: u.name, path: link!.path, expiresInHours: link!.expiresInHours }), key };
     const roles = (one("SELECT group_concat(role) r FROM user_roles WHERE user_id=?", u.id)?.r ?? "").split(",");
-    return { to: u.email, mail: welcomeEmail({ name: u.name, roles }) };
+    return { to: u.email, mail: welcomeEmail({ name: u.name, roles, verify: link }), key };
   }
-  return { to: u.email, mail: notificationEmail({ name: u.name, type: job.type, title: job.title, body: job.body, link: job.link }) };
+  return { to: u.email, mail: notificationEmail({ name: u.name, type: job.type, title: job.title, body: job.body, link: job.link }), key: job.key };
 }
 
 export async function deliver(to: string, mail: Rendered, idempotencyKey: string) {
@@ -69,5 +80,5 @@ export async function deliver(to: string, mail: Rendered, idempotencyKey: string
 registerJob("send_email", async (job: Job) => {
   const r = render(job);
   if (!r) return;
-  await deliver(r.to, r.mail, job.key);
+  await deliver(r.to, r.mail, r.key);
 });

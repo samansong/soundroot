@@ -416,3 +416,14 @@ CREATE TABLE IF NOT EXISTS jobs (
   created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS jobs_ready_idx ON jobs(status, run_after);
+
+-- Email verification links: only a hash of the token is stored. Single use, 48 h expiry.
+CREATE TABLE IF NOT EXISTS email_verifications (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token_hash TEXT NOT NULL UNIQUE,
+  expires_at TEXT NOT NULL,
+  used_at TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS email_verifications_user ON email_verifications(user_id, created_at);

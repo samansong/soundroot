@@ -3,7 +3,7 @@
 import crypto from "node:crypto";
 import { z } from "zod";
 import { addMinutes, all, insert, now, one, run, tx, uuid } from "../db.ts";
-import { type Actor, hasRole, requireActor, requireRole } from "../auth.ts";
+import { type Actor, hasRole, requireActor, requireRole, requireVerified } from "../auth.ts";
 import { AppError, badRequest, conflict, forbidden, notFound } from "../errors.ts";
 import { audit, notify } from "../audit.ts";
 import { BEAT_COMMISSION_BPS, BOOKING_COMMISSION_BPS, PROVIDER_FEE_BPS, bps, formatMoney } from "../money.ts";
@@ -19,7 +19,7 @@ const orderRef = () => `SR-${new Date().getFullYear()}-${crypto.randomBytes(3).t
 
 // ---------------- Orders
 export function createBeatOrder(actorIn: Actor | null, input: unknown) {
-  const actor = requireActor(actorIn);
+  const actor = requireVerified(actorIn);
   const { licenseVersionId, acceptTerms } = z.object({ licenseVersionId: z.string().uuid(), acceptTerms: z.literal(true, { errorMap: () => ({ message: "You must accept the license terms" }) }) }).parse(input);
 
   return tx(() => {
@@ -61,7 +61,7 @@ export function createBeatOrder(actorIn: Actor | null, input: unknown) {
 }
 
 export function createProjectOrder(actorIn: Actor | null, projectId: string) {
-  const actor = requireActor(actorIn);
+  const actor = requireVerified(actorIn);
   const p = one("SELECT * FROM projects WHERE id=?", projectId);
   if (!p) throw notFound();
   if (!one("SELECT 1 FROM project_members WHERE project_id=? AND user_id=? AND role='artist'", projectId, actor.id)) throw forbidden("Only the project artist can pay this balance");
@@ -129,7 +129,7 @@ export function myOrders(actorIn: Actor | null) {
 
 // ---------------- Checkout (provider session with idempotency key)
 export function startCheckout(actorIn: Actor | null, input: unknown) {
-  const actor = requireActor(actorIn);
+  const actor = requireVerified(actorIn);
   const { orderId, idempotencyKey, method } = z.object({ orderId: z.string().uuid(), idempotencyKey: z.string().min(8).max(80), method: z.enum(["momo", "card"]).default("momo") }).parse(input);
   const prior = one("SELECT * FROM payments WHERE idempotency_key=?", `${actor.id}:${idempotencyKey}`);
   if (prior) return { providerRef: prior.provider_ref, checkoutUrl: `/pay/${prior.provider_ref}` };
@@ -412,7 +412,7 @@ export function verifyPayoutIdentity(actorIn: Actor | null) {
 }
 
 export function requestPayout(actorIn: Actor | null) {
-  const actor = requireRole(actorIn, "beatmaker");
+  const actor = requireRole(requireVerified(actorIn), "beatmaker");
   return tx(() => {
     const p = one("SELECT payout_verified FROM producer_profiles WHERE user_id=?", actor.id);
     if (!p?.payout_verified) throw forbidden("Verify your identity with the payment provider before requesting payouts");

@@ -134,7 +134,7 @@ const STEPS: Record<string, { icon: string; color: string; title: string; text: 
   ],
 };
 
-export function welcomeEmail(d: { name: string; roles: string[] }): Rendered {
+export function welcomeEmail(d: { name: string; roles: string[]; verify?: { path: string; expiresInHours: number } | null }): Rendered {
   const role = ["studio_owner", "beatmaker", "engineer", "artist"].find((r) => d.roles.includes(r)) ?? "artist";
   const steps = STEPS[role];
   const cta = { artist: ["Explore beats", "/beats"], beatmaker: ["Open your producer studio", "/producer"], studio_owner: ["Set up your studio", "/studio"], engineer: ["Open your sessions", "/studio"] }[role] as [string, string];
@@ -151,12 +151,23 @@ export function welcomeEmail(d: { name: string; roles: string[] }): Rendered {
         </td>
       </tr></table></td></tr>`)
     .join("");
+  const verifyBlock = d.verify
+    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:24px;background:${C.ink2};border:1px solid ${C.gold}55;border-radius:18px;"><tr><td style="padding:22px 24px;font-family:${FONT};">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:${C.gold};">FIRST THINGS FIRST</div>
+        <div style="margin-top:6px;font-size:18px;font-weight:700;color:${C.text};">Confirm your email address</div>
+        <div style="margin-top:6px;font-size:14px;line-height:21px;color:${C.text2};">One tap and you're set to buy beats, book sessions and get paid.</div>
+        <div style="margin-top:18px;">${button("Confirm my email", abs(d.verify.path))}</div>
+        <div style="margin-top:12px;font-size:12px;color:${C.muted};">This link works once and expires in ${d.verify.expiresInHours} hours.</div>
+      </td></tr></table>`
+    : "";
   const body = `
     ${pill("🎉&nbsp; Welcome aboard", C.gold)}
     ${h1(`Welcome to SoundzRoot, ${esc(first(d.name))}.`)}
-    ${p("Beats, studios and delivery — the whole journey from idea to master, in one place. Here's how to get going:")}
+    ${p("Beats, studios and delivery — the whole journey from idea to master, in one place.")}
+    ${verifyBlock}
+    ${p("Here's how to get going:", "margin-top:26px;")}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:24px;">${cards}</table>
-    <div style="margin-top:30px;">${button(cta[0], abs(cta[1]))}</div>
+    ${d.verify ? "" : `<div style="margin-top:30px;">${button(cta[0], abs(cta[1]))}</div>`}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:30px;border-top:1px solid ${C.line};"><tr>
       <td class="sr-col" width="33%" style="padding:20px 8px 0 0;font-family:${FONT};"><div style="font-size:22px;font-weight:800;color:${C.teal};">MoMo</div><div style="font-size:13px;color:${C.muted};">&amp; card payments</div></td>
       <td class="sr-col" width="33%" style="padding:20px 8px 0;font-family:${FONT};"><div style="font-size:22px;font-weight:800;color:${C.plum};">0%</div><div style="font-size:13px;color:${C.muted};">fees on your own clients</div></td>
@@ -165,7 +176,7 @@ export function welcomeEmail(d: { name: string; roles: string[] }): Rendered {
   return {
     subject: `Welcome to SoundzRoot, ${first(d.name)} 🎶`,
     html: layout({ preheader: "Your account is ready — here's how to get started.", hero: { img: "/email/welcome.jpg", alt: "A young listener lost in music" }, body, footerNote: "You're receiving this because you created a SoundzRoot account." }),
-    text: `Welcome to SoundzRoot, ${first(d.name)}!\n\n${steps.map((s, i) => `${i + 1}. ${s.title} — ${s.text} ${abs(s.href)}`).join("\n")}\n\n${cta[0]}: ${abs(cta[1])}\n\n— SoundzRoot`,
+    text: `Welcome to SoundzRoot, ${first(d.name)}!\n\n${d.verify ? `Confirm your email address: ${abs(d.verify.path)}\n(expires in ${d.verify.expiresInHours} hours)\n\n` : ""}${steps.map((s, i) => `${i + 1}. ${s.title} — ${s.text} ${abs(s.href)}`).join("\n")}\n\n${cta[0]}: ${abs(cta[1])}\n\n— SoundzRoot`,
   };
 }
 
@@ -184,5 +195,23 @@ export function inviteEmail(d: { studioName: string; inviterName: string; role: 
     subject: `${d.inviterName} invited you to ${d.studioName} on SoundzRoot`,
     html: layout({ preheader: `You've been invited to join ${d.studioName}.`, hero: { img: "/email/studio.jpg", alt: "Studio session" }, body, footerNote: "You're receiving this because a studio on SoundzRoot invited this address." }),
     text: `${d.inviterName} invited you to join ${d.studioName} on SoundzRoot as ${role}.\n\nAccept: ${href}\n\nExpires in ${d.expiresInHours} hours.`,
+  };
+}
+
+// ---------------------------------------------------------------- Email verification (resend)
+
+export function verifyEmail(d: { name: string; path: string; expiresInHours: number }): Rendered {
+  const href = abs(d.path);
+  const body = `
+    ${pill("✉️&nbsp; Verify your email", C.gold)}
+    ${h1("Confirm it's you")}
+    ${p(`Hi ${esc(first(d.name))}, tap the button below to confirm this is your email address. You'll need it to buy beats, book sessions and receive payouts.`)}
+    <div style="margin-top:28px;">${button("Confirm my email", href)}</div>
+    ${p(`Or paste this link into your browser:<br><a href="${esc(href)}" style="color:${C.muted};word-break:break-all;">${esc(href)}</a>`, "font-size:13px;line-height:20px;")}
+    ${p(`The link works once and expires in ${d.expiresInHours} hours. Didn't create a SoundzRoot account? You can safely ignore this email.`, `font-size:13px;line-height:20px;color:${C.muted};`)}`;
+  return {
+    subject: "Confirm your SoundzRoot email",
+    html: layout({ preheader: "One tap to confirm your email address.", body, footerNote: "You're receiving this because someone signed up for SoundzRoot with this address." }),
+    text: `Confirm your SoundzRoot email\n\nHi ${first(d.name)}, confirm your email address here:\n${href}\n\nThe link expires in ${d.expiresInHours} hours. If you didn't sign up, ignore this email.`,
   };
 }

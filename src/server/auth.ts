@@ -14,6 +14,7 @@ export interface Actor {
   id: string;
   name: string;
   email: string;
+  emailVerified: boolean;
   roles: Role[];
   producerId: string | null;
   memberships: Membership[];
@@ -67,7 +68,7 @@ export function actorFromToken(token: string | undefined | null): Actor | null {
 }
 
 export function loadActor(userId: string): Actor | null {
-  const u = one("SELECT id, name, email FROM users WHERE id = ?", userId);
+  const u = one("SELECT id, name, email, email_verified_at FROM users WHERE id = ?", userId);
   if (!u) return null;
   const roles = all<{ role: Role }>("SELECT role FROM user_roles WHERE user_id = ?", userId).map((r) => r.role);
   const producer = one<{ id: string }>("SELECT id FROM producer_profiles WHERE user_id = ?", userId);
@@ -75,7 +76,7 @@ export function loadActor(userId: string): Actor | null {
     "SELECT studio_id, role, can_view_finance FROM memberships WHERE user_id = ? AND revoked_at IS NULL",
     userId,
   ).map((m) => ({ studioId: m.studio_id, role: m.role, canViewFinance: !!m.can_view_finance }));
-  return { id: u.id, name: u.name, email: u.email, roles, producerId: producer?.id ?? null, memberships };
+  return { id: u.id, name: u.name, email: u.email, emailVerified: !!u.email_verified_at, roles, producerId: producer?.id ?? null, memberships };
 }
 
 // ---- Authorization helpers. Every service function calls these; UI hiding is never relied on.
@@ -104,7 +105,15 @@ export function requireStudio(a: Actor | null, studioId: string, level: "staff" 
   return { actor, membership: m };
 }
 
-export function newUser(input: { email: string; name: string; password: string; phone?: string; roles: Role[] }) {
+/** Money actions (buying, booking, payouts) need a confirmed email address. */
+export function requireVerified(a: Actor | null): Actor {
+  const actor = requireActor(a);
+  if (!actor.emailVerified) throw forbidden("Please verify your email address first — check your inbox for the link, or resend it from the banner at the top of the page.", "email_unverified");
+  return actor;
+}
+
+/** verified: false for public sign-ups (they confirm via emailed link); seed, tests and admin bootstrap are pre-verified. */
+export function newUser(input: { email: string; name: string; password: string; phone?: string; roles: Role[]; verified?: boolean }) {
   const id = uuid();
   insert("users", {
     id,
@@ -112,8 +121,7 @@ export function newUser(input: { email: string; name: string; password: string; 
     name: input.name.trim(),
     phone: input.phone ?? null,
     password_hash: hashPassword(input.password),
-    // Email verification link is sent in production; dev auto-verifies.
-    email_verified_at: now(),
+    email_verified_at: input.verified === false ? null : now(),
     created_at: now(),
   });
   for (const r of new Set(input.roles)) insert("user_roles", { user_id: id, role: r });

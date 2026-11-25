@@ -521,3 +521,11 @@ p { margin: 0; }
   .hero-player { position: relative; right: auto; bottom: auto; width: 100%; margin-top: 18px; }
 }
 @media (prefers-reduced-motion: reduce) { .hero-photo { animation: none; } }
+
+/* ---------- Email verification */
+.verify-banner { display: flex; align-items: center; gap: 14px; margin: 4px clamp(16px, 3vw, 40px) 14px; max-width: 1280px; padding: 12px 14px 12px 18px; border-radius: 18px; border-color: rgba(242, 184, 75, 0.35); }
+.verify-banner .vb-icon { font-size: 1.4rem; }
+@media (max-width: 680px) { .verify-banner { flex-wrap: wrap; } .verify-banner .grow { flex-basis: calc(100% - 50px); } }
+.verify-badge { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-size: 2rem; font-weight: 800; }
+.verify-badge.ok { background: radial-gradient(circle at 35% 30%, #a5f2e2, var(--teal)); color: #04211b; box-shadow: 0 0 60px rgba(63, 209, 179, 0.45); }
+.verify-badge.bad { background: radial-gradient(circle at 35% 30%, #ffd27a, var(--clay)); color: #2a0f05; box-shadow: 0 0 60px rgba(231, 119, 79, 0.4); }
