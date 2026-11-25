@@ -480,10 +480,10 @@ function Team({ studioId, isOwner, me }: { studioId: string; isOwner: boolean; m
         <input className="input" placeholder="engineer@email.com" value={inv.email} onChange={(e) => setInv({ ...inv, email: e.target.value })} />
         <select className="select" value={inv.role} onChange={(e) => setInv({ ...inv, role: e.target.value })}><option value="engineer">Engineer — assigned sessions & projects</option><option value="manager">Manager — bookings, clients, projects</option></select>
         {isOwner && <label className="check"><input type="checkbox" checked={inv.canViewFinance} onChange={(e) => setInv({ ...inv, canViewFinance: e.target.checked })} />Allow access to financial records</label>}
-        <button className="btn btn-teal" disabled={busy || !inv.email} onClick={() => run(async () => { const r = await api<{ inviteUrl: string }>(`/api/v1/studio/${studioId}/team`, { method: "POST", json: inv }); setLink(location.origin + r.inviteUrl); await load(); }, "Invite created")}>Create invite link</button>
+        <button className="btn btn-teal" disabled={busy || !inv.email} onClick={() => run(async () => { const r = await api<{ inviteUrl: string }>(`/api/v1/studio/${studioId}/team`, { method: "POST", json: inv }); setLink(location.origin + r.inviteUrl); await load(); }, "Invite sent")}>Send invite</button>
         {link && (
           <div className="notice ok small stack" style={{ gap: 6 }}>
-            <span>Share this link (expires in 72 hours):</span>
+            <span>Invite emailed to {inv.email}. You can also share this link (expires in 72 hours):</span>
             <code className="mono" style={{ wordBreak: "break-all" }}>{link}</code>
             <button className="btn btn-sm" onClick={() => { void navigator.clipboard.writeText(link); toast("Copied", "ok"); }}>Copy</button>
           </div>

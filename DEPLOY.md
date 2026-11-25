@@ -97,3 +97,20 @@ This deployment is ready for a demo or pilot. Payments still go through the buil
 2. Turn on real email sending (notifications currently log to the console: `journalctl -u soundroot | grep "\[email\]"`) and email/phone verification links.
 3. Add MFA for admin accounts.
 4. When you outgrow one server, move to the production stack in `README.md` (PostgreSQL, Redis worker, object storage, FFmpeg worker).
+
+## Email (Resend)
+
+SoundzRoot sends branded emails from `notice@soundzroot.com`: a welcome email on sign-up, studio staff invites, and a copy of every in-app notification (sales, orders, bookings, project updates, payouts, disputes). They go out through the job queue, so a Resend outage only delays them.
+
+1. In Resend, verify the domain `soundzroot.com` (Domains → add the DNS records it shows at your DNS host).
+2. Create an API key with **Sending access**, then put it on the server:
+   ```bash
+   sudo nano /etc/soundroot/soundroot.env      # set RESEND_API_KEY=re_...
+   sudo systemctl restart soundroot
+   ```
+3. Send yourself a test of each template:
+   ```bash
+   sudo -u soundroot bash -c 'cd /opt/soundroot && set -a && . /etc/soundroot/soundroot.env && set +a && node scripts/email.ts test --to you@example.com'
+   ```
+
+Without a key, emails are only logged (`journalctl -u soundroot | grep "\[email\]"`). Preview the designs locally with `node scripts/email.ts preview`.

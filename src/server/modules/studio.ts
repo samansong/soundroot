@@ -1,5 +1,6 @@
 // Studio module: setup, availability, collision-safe bookings, CRM, staff, finance (ST-01..ST-06).
 import crypto from "node:crypto";
+import { queueInviteEmail } from "../email/send.ts";
 import { z } from "zod";
 import { addMinutes, all, insert, now, one, run, tx, uuid } from "../db.ts";
 import { type Actor, loadActor, membershipFor, requireActor, requireStudio } from "../auth.ts";
@@ -422,7 +423,9 @@ export function inviteStaff(actorIn: Actor | null, studioId: string, input: unkn
   const token = crypto.randomBytes(24).toString("base64url");
   insert("invites", { id: uuid(), studio_id: studioId, email: d.email.toLowerCase(), role: d.role, can_view_finance: d.canViewFinance, token_hash: crypto.createHash("sha256").update(token).digest("hex"), expires_at: addMinutes(new Date(), 72 * 60), created_by: actor.id, created_at: now() });
   audit(actor.id, "staff.invite", "studio", studioId, { email: d.email, role: d.role, canViewFinance: d.canViewFinance });
-  return { inviteUrl: `/invite/${token}`, expiresInHours: 72 };
+  const studio = one("SELECT name FROM studios WHERE id=?", studioId);
+  queueInviteEmail({ key: `invite-${token.slice(0, 16)}`, to: d.email.toLowerCase(), studioName: studio?.name ?? "a studio", inviterName: actor.name, role: d.role, path: `/invite/${token}`, expiresInHours: 72 });
+  return { inviteUrl: `/invite/${token}`, expiresInHours: 72, emailed: true };
 }
 
 export function inviteInfo(token: string) {

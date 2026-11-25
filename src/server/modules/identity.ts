@@ -2,6 +2,7 @@
 import { z } from "zod";
 import { all, insert, now, one, run, uuid } from "../db.ts";
 import { type Actor, type Role, createSession, newUser, requireActor, verifyPassword } from "../auth.ts";
+import { queueWelcomeEmail } from "../email/send.ts";
 import { badRequest, conflict, unauthorized } from "../errors.ts";
 import { audit } from "../audit.ts";
 import { ensureProducerProfile } from "./catalog.ts";
@@ -34,6 +35,7 @@ export function signup(input: unknown) {
     insert("services", { id: uuid(), studio_id: studioId, name: "Recording session (2h)", duration_min: 120, rate_minor: 40000 });
   }
   audit(userId, "user.signup", "user", userId, { roles: d.roles });
+  queueWelcomeEmail(userId);
   return { userId, session: createSession(userId) };
 }
 

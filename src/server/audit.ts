@@ -1,4 +1,5 @@
 import { insert, now, uuid } from "./db.ts";
+import { queueNotificationEmail } from "./email/send.ts";
 
 /** Append-only audit trail for role changes, downloads, payouts, admin and financial actions. */
 export function audit(
@@ -20,8 +21,9 @@ export function audit(
 }
 
 export function notify(userId: string, kind: string, title: string, body = "", link?: string) {
+  const id = uuid();
   insert("notifications", {
-    id: uuid(),
+    id,
     user_id: userId,
     kind,
     title,
@@ -29,6 +31,6 @@ export function notify(userId: string, kind: string, title: string, body = "", l
     link: link ?? null,
     created_at: now(),
   });
-  // Transactional email would be enqueued here (ST-06); in development we log it.
-  if (process.env.NODE_ENV !== "test") console.log(`[email] to=${userId} ${title}`);
+  // Every in-app notification is mirrored as a branded email (sent by the job queue via Resend).
+  queueNotificationEmail(`notification-${id}`, userId, kind, title, body, link);
 }
