@@ -174,7 +174,7 @@ function Calendar({ studioId, open }: { studioId: string; open: (id: string) => 
         </div>
       </div>
       <div className="row wrap xs muted" style={{ gap: 16 }}>
-        <span><span className="badge info plain" style={{ background: "hsl(168 60% 35%)", color: "white" }}>Platform</span> booked on SoundRoot</span>
+        <span><span className="badge info plain" style={{ background: "hsl(168 60% 35%)", color: "white" }}>Platform</span> booked on SoundzRoot</span>
         <span><span className="badge plain" style={{ background: "hsl(268 60% 35%)", color: "white" }}>Manual</span> walk-in / your client (0% commission)</span>
         <span><span className="badge plain" style={{ background: "hsl(40 60% 35%)", color: "white" }}>Held</span> awaiting deposit</span>
       </div>
@@ -199,7 +199,7 @@ function BookingModal({ id, onClose, studio, manager, canFinance, reload }: { id
         <div className="stack lg">
           <div className="row between wrap">
             <div><b style={{ fontSize: "1.1rem" }}>{tzFmt(b.starts_at)} – {new Date(b.ends_at).toLocaleTimeString("en-GB", { timeZone: studio.timezone, hour: "2-digit", minute: "2-digit" })}</b>
-              <div className="muted small">{studio.services.find((s: any) => s.id === b.service_id)?.name} · {studio.rooms.find((r: any) => r.id === b.room_id)?.name} · {b.source === "manual" ? "Manual booking" : "Booked on SoundRoot"}</div></div>
+              <div className="muted small">{studio.services.find((s: any) => s.id === b.service_id)?.name} · {studio.rooms.find((r: any) => r.id === b.room_id)?.name} · {b.source === "manual" ? "Manual booking" : "Booked on SoundzRoot"}</div></div>
             {bookingStatus(b)}
           </div>
           {b.notes && <div className="notice info small">“{b.notes}”</div>}
@@ -301,7 +301,7 @@ function Clients({ studioId, canFinance }: { studioId: string; canFinance: boole
           <tbody>
             {filtered.map((c) => (
               <tr key={c.id}>
-                <td><div className="row"><Avatar name={c.name} hue={(c.name.charCodeAt(0) * 37) % 360} /><div><b>{c.name}</b>{c.user_id && <div className="xs teal">On SoundRoot</div>}</div></div></td>
+                <td><div className="row"><Avatar name={c.name} hue={(c.name.charCodeAt(0) * 37) % 360} /><div><b>{c.name}</b>{c.user_id && <div className="xs teal">On SoundzRoot</div>}</div></div></td>
                 <td className="small text-2">{c.email ?? ""}<div>{c.phone ?? ""}</div></td>
                 <td>{c.bookings}</td><td>{c.projects}</td>
                 <td className="small">{c.last_session ? new Date(c.last_session).toLocaleDateString("en-GB") : "—"}</td>
@@ -376,7 +376,7 @@ function Projects({ studioId, manager }: { studioId: string; manager: boolean })
             <label className="label">Revisions<input className="input" type="number" min={0} max={20} value={f.revisionAllowance} onChange={(e) => setF({ ...f, revisionAllowance: e.target.value })} /></label>
           </div>
           <label className="label">Deliverables<textarea className="textarea" value={f.deliverables} onChange={(e) => setF({ ...f, deliverables: e.target.value })} /></label>
-          <span className="xs muted">Clients with a SoundRoot account are added as project members so they can review and approve.</span>
+          <span className="xs muted">Clients with a SoundzRoot account are added as project members so they can review and approve.</span>
           <button className="btn btn-teal" disabled={busy || !f.title || !f.clientId} onClick={() => run(async () => {
             const r = await api<{ id: string }>("/api/v1/projects", { method: "POST", json: { studioId, title: f.title, clientId: f.clientId, engineerId: f.engineerId || null, priceMajor: Number(f.priceMajor) || 0, dueDate: f.dueDate || null, revisionAllowance: Number(f.revisionAllowance), deliverables: f.deliverables } });
             router.push(`/projects/${r.id}`);

@@ -1,6 +1,6 @@
-# Deploying SoundRoot to a VPS (domain on Bluehost)
+# Deploying SoundzRoot to a VPS (domain on Bluehost)
 
-You keep your domain at Bluehost and run SoundRoot on a small Linux server. The scripts in `deploy/` handle the server side.
+You keep your domain at Bluehost and run SoundzRoot on a small Linux server. The scripts in `deploy/` handle the server side.
 
 **Architecture on the server**
 

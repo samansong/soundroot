@@ -91,7 +91,7 @@ export default async function Home() {
           {!actor?.memberships.length && (
             <Link href="/signup" className="card stack" style={{ justifyContent: "center", alignContent: "center", textAlign: "center", borderStyle: "dashed" }}>
               <div className="eyebrow">For studio owners</div>
-              <h3>Run your studio on SoundRoot</h3>
+              <h3>Run your studio on SoundzRoot</h3>
               <p className="muted small">Bring your existing clients — bookings you enter yourself are never charged commission.</p>
               <span className="btn btn-teal btn-sm" style={{ justifySelf: "center" }}>List your studio</span>
             </Link>
@@ -100,7 +100,7 @@ export default async function Home() {
       </section>
 
       <footer className="muted xs" style={{ borderTop: "1px solid var(--line)", paddingTop: 20 }}>
-        SoundRoot MVP · Sample names, studios and amounts are fictional. A license grants usage rights — never an automatic copyright assignment.
+        SoundzRoot MVP · Sample names, studios and amounts are fictional. A license grants usage rights — never an automatic copyright assignment.
       </footer>
     </div>
   );

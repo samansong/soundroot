@@ -1,6 +1,6 @@
-# SoundRoot — MVP
+# SoundzRoot — MVP
 
-The operating system for African music production: **beat commerce**, **studio operations** and **project delivery** in one responsive web app, built from *SoundRoot Developer Product Specification v1.0*.
+The operating system for African music production: **beat commerce**, **studio operations** and **project delivery** in one responsive web app, built from *SoundzRoot Developer Product Specification v1.0*.
 
 ## Quick start
 
@@ -77,7 +77,7 @@ src/
 
 ## Deploying
 
-To run SoundRoot on a VPS behind your own domain (HTTPS, systemd, daily backups), see [DEPLOY.md](DEPLOY.md).
+To run SoundzRoot on a VPS behind your own domain (HTTPS, systemd, daily backups), see [DEPLOY.md](DEPLOY.md).
 
 ## Going to production
 

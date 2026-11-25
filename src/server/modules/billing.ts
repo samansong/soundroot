@@ -442,7 +442,7 @@ export function licenseDocument(actorIn: Actor | null, orderId: string) {
   const t: LicenseTerms = s.terms;
   const lim = (n: number | null) => (n === null ? "Unlimited" : n.toLocaleString());
   const lines = [
-    ["h1", "SoundRoot License Agreement"],
+    ["h1", "SoundzRoot License Agreement"],
     ["p", `Order ${o.reference}  ·  Issued ${new Date(o.paid_at ?? o.created_at).toUTCString()}`],
     ["h2", `${s.beat.title} — ${s.name} (license version ${s.version})`],
     ["p", `Licensor (producer): ${s.beat.producer}`],
@@ -459,7 +459,7 @@ export function licenseDocument(actorIn: Actor | null, orderId: string) {
     ["p", s.copyrightNotice],
     ["p", `License ID ${s.licenseVersionId} · Snapshot is immutable and stored with the order.`],
   ] as const;
-  return { filename: `SoundRoot-License-${o.reference}.pdf`, pdf: simplePdf(lines as unknown as [string, string][]) };
+  return { filename: `SoundzRoot-License-${o.reference}.pdf`, pdf: simplePdf(lines as unknown as [string, string][]) };
 }
 
 /** Tiny dependency-free PDF writer (Helvetica, word-wrapped). */
@@ -467,7 +467,7 @@ function simplePdf(blocks: [string, string][]): Uint8Array {
   const esc = (s: string) => s.replace(/[^\x20-\x7e]/g, "-").replace(/([\\()])/g, "\\$1");
   const ops: string[] = ["0.07 0.12 0.14 rg 0 792 612 -70 re f", "0.91 0.69 0.29 rg 50 760 60 4 re f"];
   let y = 740;
-  ops.push(`BT /F2 11 Tf 1 1 1 rg 50 ${y + 4} Td (SOUNDROOT) Tj ET`);
+  ops.push(`BT /F2 11 Tf 1 1 1 rg 50 ${y + 4} Td (SOUNDZROOT) Tj ET`);
   y = 690;
   for (const [kind, text] of blocks) {
     const size = kind === "h1" ? 20 : kind === "h2" ? 13 : 10;

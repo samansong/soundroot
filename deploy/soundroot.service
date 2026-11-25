@@ -1,5 +1,5 @@
 [Unit]
-Description=SoundRoot (Next.js app + job worker)
+Description=SoundzRoot (Next.js app + job worker)
 After=network-online.target
 Wants=network-online.target
 

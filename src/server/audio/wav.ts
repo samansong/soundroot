@@ -98,7 +98,7 @@ export function durationMs(pcm: Pcm) {
 
 /**
  * Preview transcode: mono, lower sample rate, capped length, fades and an audible
- * "SoundRoot" chime tag every ~9s. Tagged previews deter casual ripping, but browser
+ * "SoundzRoot" chime tag every ~9s. Tagged previews deter casual ripping, but browser
  * playback can never fully prevent copying (spec §13).
  */
 export function makePreview(pcm: Pcm, opts: { maxSeconds?: number; tag?: boolean } = {}): Pcm {

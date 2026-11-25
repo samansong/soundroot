@@ -1,5 +1,5 @@
 [Unit]
-Description=SoundRoot backup (database + audio storage)
+Description=SoundzRoot backup (database + audio storage)
 
 [Service]
 Type=oneshot

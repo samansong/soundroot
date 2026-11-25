@@ -1,5 +1,5 @@
 [Unit]
-Description=Daily SoundRoot backup
+Description=Daily SoundzRoot backup
 
 [Timer]
 OnCalendar=*-*-* 03:15:00

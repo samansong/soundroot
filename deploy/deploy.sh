@@ -35,8 +35,8 @@ echo "==> Restarting"
 systemctl restart soundroot
 sleep 3
 if systemctl is-active --quiet soundroot && curl -fsS -o /dev/null http://127.0.0.1:3000/; then
-  echo "==> SoundRoot is up."
+  echo "==> SoundzRoot is up."
 else
-  echo "!! SoundRoot did not come up. Check: journalctl -u soundroot -n 100" >&2
+  echo "!! SoundzRoot did not come up. Check: journalctl -u soundroot -n 100" >&2
   exit 1
 fi

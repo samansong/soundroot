@@ -30,7 +30,7 @@ export function ProducerDashboard() {
   return (
     <div className="stack lg">
       <header className="row between wrap">
-        <div><div className="eyebrow">Producer studio</div><h1 style={{ marginTop: 10 }}>Your beat catalog</h1>{data.profile && <Link href={`/producers/${data.profile.slug}`} className="small muted">soundroot / {data.profile.slug} ↗</Link>}</div>
+        <div><div className="eyebrow">Producer studio</div><h1 style={{ marginTop: 10 }}>Your beat catalog</h1>{data.profile && <Link href={`/producers/${data.profile.slug}`} className="small muted">soundzroot / {data.profile.slug} ↗</Link>}</div>
         <button className="btn btn-primary" onClick={() => { setEditing(null); setTab("upload"); }}><IconPlus />Upload beat</button>
       </header>
       <div className="grid cols-4">
@@ -266,7 +266,7 @@ function Payouts({ data, payouts, reload }: { data: Catalog; payouts: any[]; rel
         ) : (
           <button className="btn btn-primary" disabled={busy || data.stats.availableMinor < 1000} onClick={() => run(async () => { await api("/api/v1/producer/payouts", { method: "POST", json: { action: "request" } }); await reload(); }, "Payout sent")}>Request payout</button>
         )}
-        <span className="xs muted">Minimum GHS 10. Funds are held and settled by the licensed payment provider — SoundRoot never holds your money directly.</span>
+        <span className="xs muted">Minimum GHS 10. Funds are held and settled by the licensed payment provider — SoundzRoot never holds your money directly.</span>
       </div>
       <div className="card stack">
         <h3>Payout history</h3>

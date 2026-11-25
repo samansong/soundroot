@@ -1,4 +1,4 @@
--- SoundRoot relational core (development: SQLite; production: PostgreSQL).
+-- SoundzRoot relational core (development: SQLite; production: PostgreSQL).
 -- UUID primary keys, ISO-8601 UTC timestamps, money in minor units (pesewas).
 
 CREATE TABLE IF NOT EXISTS users (

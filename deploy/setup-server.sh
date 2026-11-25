@@ -17,7 +17,7 @@ APP_DIR=/opt/soundroot
 ENV_FILE=/etc/soundroot/soundroot.env
 
 if [[ $EUID -ne 0 ]]; then echo "Run as root (sudo)." >&2; exit 1; fi
-echo "==> Provisioning SoundRoot for https://${DOMAIN}"
+echo "==> Provisioning SoundzRoot for https://${DOMAIN}"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
@@ -81,7 +81,7 @@ systemctl start soundroot-backup.timer
 
 cat <<EOF
 
-==> Done. SoundRoot should be live at https://${DOMAIN} once DNS points here.
+==> Done. SoundzRoot should be live at https://${DOMAIN} once DNS points here.
 
 Next steps:
   1. Bluehost DNS: add an A record for ${DOMAIN} -> $(curl -fsS https://api.ipify.org || echo "<this server's IP>")

@@ -2,7 +2,7 @@
   "name": "soundroot",
   "version": "0.1.0",
   "private": true,
-  "description": "SoundRoot — the operating system for African music production (MVP).",
+  "description": "SoundzRoot — the operating system for African music production (MVP).",
   "scripts": {
     "dev": "next dev -p 3000",
     "predev": "node --disable-warning=ExperimentalWarning scripts/seed.ts --if-empty",

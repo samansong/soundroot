@@ -32,7 +32,7 @@ export function Shell({ actor, children }: { actor: Actor | null; children: Reac
       <Ambient />
       <div className="shell">
         <aside className="sidebar" aria-label="Primary">
-          <Link href="/" className="brand"><Logo />SOUNDROOT</Link>
+          <Link href="/" className="brand"><Logo />SOUNDZROOT</Link>
           {nav.map((n) => <Link key={n.href} href={n.href} className={`nav-link ${is(n.href) ? "active" : ""}`}><n.icon />{n.label}</Link>)}
           {work.length > 0 && <div className="nav-label">Workspace</div>}
           {work.map((n) => <Link key={n.href} href={n.href} className={`nav-link ${is(n.href) ? "active" : ""}`}><n.icon />{n.label}</Link>)}
@@ -79,7 +79,7 @@ function TopBar({ actor }: { actor: Actor | null }) {
       ) : (
         <div className="row">
           <Link href="/login" className="btn btn-ghost btn-sm">Sign in</Link>
-          <Link href="/signup" className="btn btn-primary btn-sm">Join SoundRoot</Link>
+          <Link href="/signup" className="btn btn-primary btn-sm">Join SoundzRoot</Link>
         </div>
       )}
     </header>

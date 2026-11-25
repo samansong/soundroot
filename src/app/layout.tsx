@@ -8,7 +8,7 @@ const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bric
 const body = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "SoundRoot — the operating system for African music production", template: "%s · SoundRoot" },
+  title: { default: "SoundzRoot — the operating system for African music production", template: "%s · SoundzRoot" },
   description: "License beats from independent African producers, book studio sessions, and get your mixes delivered — all in one place.",
 };
 export const viewport: Viewport = { themeColor: "#070d10" };

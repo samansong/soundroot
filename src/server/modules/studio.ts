@@ -494,7 +494,7 @@ export function studioReport(actorIn: Actor | null, studioId: string, input: unk
       platformFeesMinor: platformFees,
       expensesMinor: expenses.reduce((a, e) => a + e.amount_minor, 0),
       netMinor: ledger("'seller_payable','refund'") - expenses.reduce((a, e) => a + e.amount_minor, 0),
-      commissionNote: `Platform commission (${BOOKING_COMMISSION_BPS / 100}%) applies only to bookings made through SoundRoot. Walk-ins and your own clients are never charged.`,
+      commissionNote: `Platform commission (${BOOKING_COMMISSION_BPS / 100}%) applies only to bookings made through SoundzRoot. Walk-ins and your own clients are never charged.`,
     },
     bookings,
     expenses,

@@ -38,7 +38,7 @@ export function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: stri
       <div className="card stack lg" style={{ padding: 30 }}>
         <div className="stack" style={{ gap: 6 }}>
           <Logo size={40} />
-          <h2 style={{ marginTop: 8 }}>{mode === "login" ? "Welcome back" : "Join SoundRoot"}</h2>
+          <h2 style={{ marginTop: 8 }}>{mode === "login" ? "Welcome back" : "Join SoundzRoot"}</h2>
           <p className="muted small">{mode === "login" ? "Sign in to your studio, catalog and projects." : "One account — add more roles any time."}</p>
         </div>
         <form className="stack" onSubmit={submit}>

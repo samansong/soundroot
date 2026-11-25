@@ -33,7 +33,7 @@ export function SandboxPay({ session }: { session: Session }) {
           <span style={{ background: "#fff3cd", color: "#7a5a00", fontSize: 11, fontWeight: 800, padding: "3px 8px", borderRadius: 6 }}>TEST MODE</span>
         </div>
         <div>
-          <div style={{ fontSize: 13, color: "#5b6478" }}>Pay SoundRoot</div>
+          <div style={{ fontSize: 13, color: "#5b6478" }}>Pay SoundzRoot</div>
           <div style={{ fontSize: "2.2rem", fontWeight: 800, letterSpacing: "-.03em" }}>{money(session.amountMinor, session.currency)}</div>
           <div style={{ fontSize: 13, color: "#5b6478" }}>{session.description}</div>
           <div style={{ fontSize: 12, color: "#8a93a6", marginTop: 4 }}>Ref {session.reference} · {session.providerRef}</div>

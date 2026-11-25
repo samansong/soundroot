@@ -1,4 +1,4 @@
-# Caddy reverse proxy for SoundRoot. setup-server.sh replaces __DOMAIN__ and installs this as /etc/caddy/Caddyfile.
+# Caddy reverse proxy for SoundzRoot. setup-server.sh replaces __DOMAIN__ and installs this as /etc/caddy/Caddyfile.
 # Caddy obtains and renews the HTTPS certificate automatically once DNS points at this server.
 __DOMAIN__ {
 	encode zstd gzip
