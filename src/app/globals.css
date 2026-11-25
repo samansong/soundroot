@@ -557,7 +557,7 @@ p { margin: 0; }
   .table td, .table th { white-space: nowrap; }
   .topbar { gap: 10px; padding: 10px 16px; }
   .page { padding: 6px 16px 32px; }
-  .pop { position: fixed; left: 12px; right: 12px; top: 64px; width: auto !important; max-height: 75vh; }
+  .pop { position: fixed; left: 12px; right: 12px; top: calc(100% + 6px); width: auto !important; max-height: 75vh; }
   .verify-banner { margin: 2px 16px 12px; }
   .tabs { width: 100%; scrollbar-width: none; }
   .tabs::-webkit-scrollbar { display: none; }
@@ -634,3 +634,28 @@ body:has(.modal-back) .mobile-nav, body:has(.modal-back) .playerbar { visibility
 }
 @media (max-width: 400px) { .hero-player { grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 12px; } .hero-player .hp-spectrum { display: none; } .hp-btn { width: 48px; height: 48px; } }
 @media (max-width: 900px) { .tabs[role="group"] { width: fit-content; } }
+
+/* ---------- Phone top bar: brand + actions on the first row, a full-width glass search bar below. */
+.topbar-word { display: none; }
+.search-input input[type="search"]::-webkit-search-cancel-button { filter: invert(0.7); cursor: pointer; }
+@media (max-width: 680px) {
+  .topbar { flex-wrap: wrap; row-gap: 10px; padding: 10px 16px 12px; background: linear-gradient(180deg, rgba(7, 13, 16, 0.94), rgba(7, 13, 16, 0.78)); backdrop-filter: blur(18px) saturate(150%); -webkit-backdrop-filter: blur(18px) saturate(150%); border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+  .topbar-brand { gap: 8px; }
+  .topbar-word { display: inline; font-family: var(--font-display); font-weight: 800; font-size: 0.82rem; letter-spacing: 0.16em; color: var(--gold); }
+  .topbar .search { display: block; order: 10; flex: 1 1 100%; max-width: none; }
+  .topbar .search .input {
+    height: 46px; font-size: 16px; /* 16px stops iOS zooming in on focus */
+    padding-left: 46px; border-radius: 999px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 10px 30px -18px rgba(0, 0, 0, 0.8);
+  }
+  .topbar .search .input::placeholder { color: rgba(238, 244, 242, 0.5); }
+  .topbar .search .input:focus { border-color: rgba(63, 209, 179, 0.55); box-shadow: 0 0 0 4px rgba(63, 209, 179, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.12); }
+  .topbar .search svg { left: 17px; width: 19px; height: 19px; color: rgba(238, 244, 242, 0.65); }
+  .topbar .btn-sm { height: 36px; }
+  .pop { top: calc(100% + 6px); }
+}
+@media (max-width: 360px) { .topbar-word { display: none; } }
+@media (max-width: 680px) { .topbar.has-page-search .search { display: none; } }
+@media (max-width: 680px) { .join-full { display: none; } .topbar > .row { flex-wrap: nowrap; gap: 4px; } .topbar > .row .btn-ghost { padding: 0 10px; } }

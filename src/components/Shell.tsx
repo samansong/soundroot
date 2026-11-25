@@ -68,15 +68,16 @@ export function Shell({ actor, children }: { actor: Actor | null; children: Reac
 function TopBar({ actor }: { actor: Actor | null }) {
   const router = useRouter();
   const [q, setQ] = useState("");
+  // The beats page has its own live search, so the top bar's is hidden there on phones.
+  const onBeats = usePathname() === "/beats";
   return (
-    <header className="topbar">
-      <Link href="/" className="topbar-brand mobile-only" aria-label="SoundzRoot home"><Logo /></Link>
+    <header className={onBeats ? "topbar has-page-search" : "topbar"}>
+      <Link href="/" className="topbar-brand mobile-only" aria-label="SoundzRoot home"><Logo /><span className="topbar-word">SOUNDZROOT</span></Link>
       <form className="search search-input" role="search" onSubmit={(e) => { e.preventDefault(); router.push(`/beats?q=${encodeURIComponent(q)}`); }}>
         <IconSearch />
-        <input className="input" placeholder="Search beats, producers, genres…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search beats" />
+        <input className="input" type="search" enterKeyHint="search" placeholder="Search beats, producers…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search beats" />
       </form>
       <div className="grow" />
-      <Link href="/beats" className="icon-btn phone-only" aria-label="Search beats"><IconSearch /></Link>
       {actor ? (
         <>
           <Notifications />
@@ -85,7 +86,7 @@ function TopBar({ actor }: { actor: Actor | null }) {
       ) : (
         <div className="row">
           <Link href="/login" className="btn btn-ghost btn-sm">Sign in</Link>
-          <Link href="/signup" className="btn btn-primary btn-sm">Join SoundzRoot</Link>
+          <Link href="/signup" className="btn btn-primary btn-sm">Join<span className="join-full">&nbsp;SoundzRoot</span></Link>
         </div>
       )}
     </header>
