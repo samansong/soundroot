@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { IconX } from "./icons";
 
 export async function api<T = any>(url: string, init: RequestInit & { json?: unknown } = {}): Promise<T> {
@@ -45,8 +46,9 @@ export function Modal({ open, onClose, title, children, width }: { open: boolean
     window.addEventListener("keydown", k);
     return () => window.removeEventListener("keydown", k);
   }, [open, onClose]);
-  if (!open) return null;
-  return (
+  if (!open || typeof document === "undefined") return null;
+  // Portal to <body> so the dialog is never trapped by a blurred/transformed ancestor (which breaks position: fixed).
+  return createPortal(
     <div className="modal-back" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal" role="dialog" aria-modal="true" aria-label={title} style={width ? { width: `min(${width}px, 100%)` } : undefined}>
         <div className="row between" style={{ marginBottom: 16 }}>
@@ -55,7 +57,8 @@ export function Modal({ open, onClose, title, children, width }: { open: boolean
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

@@ -8,6 +8,7 @@ import { PlayerBar } from "./PlayerBar";
 import { api, Avatar, ToastProvider } from "./ui";
 import { Ambient } from "./visuals";
 import { VerifyBanner } from "./VerifyBanner";
+import { ResponsiveTables } from "./ResponsiveTables";
 
 type Notif = { id: string; title: string; body: string; link: string | null; read_at: string | null; created_at: string };
 
@@ -31,6 +32,7 @@ export function Shell({ actor, children }: { actor: Actor | null; children: Reac
   return (
     <ToastProvider>
       <Ambient />
+      <ResponsiveTables />
       <div className="shell">
         <aside className="sidebar" aria-label="Primary">
           <Link href="/" className="brand"><Logo />SOUNDZROOT</Link>
@@ -68,11 +70,13 @@ function TopBar({ actor }: { actor: Actor | null }) {
   const [q, setQ] = useState("");
   return (
     <header className="topbar">
+      <Link href="/" className="topbar-brand mobile-only" aria-label="SoundzRoot home"><Logo /></Link>
       <form className="search search-input" role="search" onSubmit={(e) => { e.preventDefault(); router.push(`/beats?q=${encodeURIComponent(q)}`); }}>
         <IconSearch />
         <input className="input" placeholder="Search beats, producers, genres…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search beats" />
       </form>
       <div className="grow" />
+      <Link href="/beats" className="icon-btn phone-only" aria-label="Search beats"><IconSearch /></Link>
       {actor ? (
         <>
           <Notifications />
@@ -147,7 +151,7 @@ function AccountMenu({ actor }: { actor: Actor }) {
     <div style={{ position: "relative" }} ref={ref}>
       <button className="row btn btn-ghost" style={{ padding: "0 6px 0 4px" }} onClick={() => setOpen(!open)} aria-expanded={open} aria-label="Account menu">
         <Avatar name={actor.name} hue={(actor.name.charCodeAt(0) * 37) % 360} />
-        <span className="small" style={{ fontWeight: 700 }}>{actor.name.split(" ")[0]}</span>
+        <span className="small acct-name" style={{ fontWeight: 700 }}>{actor.name.split(" ")[0]}</span>
       </button>
       {open && (
         <div className="pop" style={{ width: 260 }}>

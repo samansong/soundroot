@@ -86,8 +86,8 @@ function Overview({ ws, open }: { ws: any; open: (id: string) => void }) {
           <h3>Upcoming sessions</h3>
           {ws.upcoming.length === 0 && <div className="muted small">Nothing scheduled.</div>}
           {ws.upcoming.map((b: any) => (
-            <button key={b.id} className="row card flat tight" style={{ textAlign: "left", cursor: "pointer", gap: 16 }} onClick={() => open(b.id)}>
-              <div style={{ width: 64 }}><b style={{ fontFamily: "var(--font-display)", fontSize: "1.2rem" }}>{b.local_time}</b><div className="xs muted">{b.local_date.slice(5)}</div></div>
+            <button key={b.id} className="row card flat tight session-row" style={{ textAlign: "left", cursor: "pointer", gap: 16 }} onClick={() => open(b.id)}>
+              <div style={{ width: 64, flex: "none" }}><b style={{ fontFamily: "var(--font-display)", fontSize: "1.2rem" }}>{b.local_time}</b><div className="xs muted">{b.local_date.slice(5)}</div></div>
               <div className="grow" style={{ minWidth: 0 }}><b>{b.client_name ?? "Client"}</b> <span className="text-2">/ {b.service_name}</span><div className="xs muted truncate">{b.room_name}{b.engineer_name ? ` · ${b.engineer_name}` : ""}</div></div>
               {bookingStatus(b)}
             </button>

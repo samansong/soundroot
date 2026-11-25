@@ -21,8 +21,8 @@ export function BeatHeroPlayer({ beat }: { beat: Beat }) {
   if (!beat.previewUrl) return <div className="notice warn">Preview is still processing.</div>;
   return (
     <div className="glass" style={{ padding: 16, display: "grid", gap: 10 }}>
-      <div className="row" style={{ gap: 14 }}>
-        <button className="pb-play" style={{ width: 56, height: 56 }} onClick={() => player.toggle(beatTrack(beat))} aria-label={playing ? "Pause preview" : "Play preview"}>
+      <div className="row bd-player" style={{ gap: 14 }}>
+        <button className="pb-play" style={{ width: 56, height: 56, flex: "none" }} onClick={() => player.toggle(beatTrack(beat))} aria-label={playing ? "Pause preview" : "Play preview"}>
           {playing ? <IconPause /> : <IconPlay style={{ marginLeft: 3 }} />}
         </button>
         <div className="grow">
@@ -31,7 +31,7 @@ export function BeatHeroPlayer({ beat }: { beat: Beat }) {
         </div>
         <Spectrum hue={beat.hue} bars={10} className="pb-spectrum" />
       </div>
-      <div className="row between xs muted"><span>{fmtTime(time)} / {fmtTime(duration)}</span><span>Tagged 30-second preview · full untagged files come with your license</span></div>
+      <div className="row between xs muted bd-meta"><span style={{ whiteSpace: "nowrap" }}>{fmtTime(time)} / {fmtTime(duration)}</span><span>Tagged 30-second preview · full untagged files come with your license</span></div>
     </div>
   );
 }

@@ -34,8 +34,8 @@ export function BeatExplorer({ result, facets, params }: { result: Result; facet
     <div className="stack lg">
       <div className="card flat stack" style={{ gap: 14 }}>
         <div className="row wrap" style={{ gap: 10 }}>
-          <input className="input grow" style={{ maxWidth: 380, borderRadius: 999 }} placeholder="Search title, producer, mood…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search beats" />
-          <select className="select" style={{ width: 170 }} value={params.sort ?? "newest"} onChange={(e) => update({ sort: e.target.value })} aria-label="Sort">
+          <input className="input grow be-search" style={{ maxWidth: 380, borderRadius: 999 }} placeholder="Search title, producer, mood…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search beats" />
+          <select className="select be-sort" style={{ width: 170 }} value={params.sort ?? "newest"} onChange={(e) => update({ sort: e.target.value })} aria-label="Sort">
             <option value="newest">Newest</option>
             <option value="popular">Most popular</option>
             <option value="price_asc">Price: low to high</option>

@@ -538,3 +538,99 @@ p { margin: 0; }
 .switch.on { background: linear-gradient(135deg, var(--teal-2), var(--teal)); border-color: transparent; }
 .switch.on .knob { transform: translateX(22px); }
 .switch:disabled { cursor: not-allowed; }
+
+/* =====================================================================
+   Mobile polish — tablets (≤900px) and phones (≤680px / ≤380px)
+   ===================================================================== */
+.mobile-only, .phone-only { display: none !important; }
+.grid > * { min-width: 0; }
+.input, .select, textarea { max-width: 100%; }
+.topbar-brand { align-items: center; }
+.topbar-brand .brand-mark { width: 32px; height: 32px; }
+
+@media (max-width: 900px) {
+  .mobile-only { display: inline-flex !important; }
+  /* Two-column layouts set inline (workspace + sidebar panels) stack on small screens. */
+  .grid[style*="grid-template-columns"] { grid-template-columns: minmax(0, 1fr) !important; }
+  /* Every table scrolls sideways inside its own box instead of widening the page. */
+  .table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table td, .table th { white-space: nowrap; }
+  .topbar { gap: 10px; padding: 10px 16px; }
+  .page { padding: 6px 16px 32px; }
+  .pop { position: fixed; left: 12px; right: 12px; top: 64px; width: auto !important; max-height: 75vh; }
+  .verify-banner { margin: 2px 16px 12px; }
+  .tabs { width: 100%; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .section-head { flex-wrap: wrap; align-items: flex-start; }
+  .main { padding-bottom: calc(var(--playerbar) + 120px); }
+}
+
+@media (max-width: 680px) {
+  .phone-only { display: inline-flex !important; }
+  .topbar .search { display: none; }
+  .acct-name { display: none; }
+  h1 { font-size: clamp(1.75rem, 8vw, 2.2rem); }
+  .card { padding: 16px; }
+  /* Stat tiles sit two-up instead of one per screen. */
+  .grid:has(> .stat) { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px; }
+  .stat { padding: 14px; }
+  .stat .value { font-size: 1.35rem; overflow-wrap: anywhere; }
+  .stat .label-sm { font-size: 0.72rem; }
+  /* Beat explorer filters: full-width search, sort fills the row. */
+  .be-search { flex: 1 1 100% !important; max-width: none !important; }
+  .be-sort { flex: 1 1 auto; width: auto !important; }
+  /* Beat detail preview player. */
+  .bd-player .pb-spectrum { display: none; }
+  .bd-meta { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .bars { gap: 6px; height: 140px; }
+  .btn-lg { height: 48px; padding: 0 20px; }
+  .hero-copy .row .btn-lg { flex: 1 1 auto; justify-content: center; }
+  .notice { overflow-wrap: anywhere; }
+  .empty { padding: 34px 16px; }
+}
+
+@media (max-width: 380px) {
+  .page { padding: 4px 12px 28px; }
+  .topbar { padding: 8px 12px; gap: 8px; }
+  .icon-btn { width: 38px; height: 38px; }
+  .hero-stage { padding: 22px 16px 16px; }
+  .hero-copy h1 { font-size: 2.3rem; }
+}
+@media (max-width: 340px) { .grid:has(> .stat) { grid-template-columns: minmax(0, 1fr) !important; } }
+@media (max-width: 680px) {
+  .session-row { flex-wrap: wrap; gap: 6px 12px !important; }
+  .session-row > .badge, .session-row > span:last-child { margin-left: 76px; }
+}
+@media (max-width: 680px) {
+  /* List rows built as flex cards (team members, sessions, deliverables…) wrap instead of overflowing. */
+  .card.row, .card.flat.row, .card.tight.row { flex-wrap: wrap; row-gap: 8px; }
+  .card.row > .grow, .session-row > .grow { flex: 1 1 150px; min-width: 0; overflow-wrap: anywhere; }
+}
+/* Dialogs become bottom sheets on phones, above the nav and player. */
+.modal-back { z-index: 200; }
+body:has(.modal-back) .mobile-nav, body:has(.modal-back) .playerbar { visibility: hidden; }
+@media (max-width: 680px) {
+  .modal-back { place-items: end stretch; padding: 0; }
+  .modal { width: 100% !important; max-height: 90vh; border-radius: 24px 24px 0 0; padding: 20px 18px calc(22px + env(safe-area-inset-bottom)); animation: sheet-up 0.28s cubic-bezier(.2,.8,.2,1); }
+  .modal .input[type="datetime-local"], .modal .select, .modal .input { width: 100% !important; }
+  .modal .row.between { flex-wrap: wrap; gap: 4px 12px; }
+}
+@keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (max-width: 680px) { .modal .grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } .modal .grid.cols-3 > .card { padding: 10px; } }
+/* Data tables become labelled cards on phones (labels come from <ResponsiveTables/>). */
+@media (max-width: 680px) {
+  .table { display: block; overflow: visible; border-spacing: 0; }
+  .table thead { display: none; }
+  .table tbody { display: grid; gap: 10px; }
+  .table tr { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: rgba(22, 43, 50, 0.5); }
+  .table td, .table td:first-child, .table td:last-child { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0; background: none; border: 0; border-radius: 0; white-space: normal; text-align: right; min-width: 0; overflow-wrap: anywhere; }
+  .table td::before { content: attr(data-label); flex: none; max-width: 45%; text-align: left; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .table td[data-label=""]::before { display: none; }
+  /* The first cell is the row's title: full width, left aligned, no label. */
+  .table td:first-child { justify-content: flex-start; text-align: left; padding-bottom: 6px; margin-bottom: 2px; border-bottom: 1px solid var(--line); }
+  .table td:first-child::before { display: none; }
+  .table td:empty { display: none; }
+  .table tr.clickable:hover td { background: none; }
+}
+@media (max-width: 400px) { .hero-player { grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 12px; } .hero-player .hp-spectrum { display: none; } .hp-btn { width: 48px; height: 48px; } }
+@media (max-width: 900px) { .tabs[role="group"] { width: fit-content; } }
