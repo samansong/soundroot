@@ -94,7 +94,7 @@ Backups live on the same server, so they don't protect against losing the server
 This deployment is ready for a demo or pilot. Payments still go through the built-in **sandbox** provider (`/pay/...`, clearly marked test mode); no real money moves. Before launch:
 
 1. Integrate a licensed provider that supports MoMo and cards in Ghana (e.g. Paystack, Flutterwave, Hubtel, MTN MoMo API) with marketplace settlement and seller KYC. Replace `sandboxAuthorize` and the hosted page; the webhook handler, ledger and fulfilment already enforce signature, amount and dedup checks.
-2. Turn on real email sending (notifications currently log to the console: `journalctl -u soundroot | grep "\[email\]"`) and email/phone verification links.
+2. Add email/phone verification links (transactional email through Resend is already built in; see "Email (Resend)" below).
 3. Add MFA for admin accounts.
 4. When you outgrow one server, move to the production stack in `README.md` (PostgreSQL, Redis worker, object storage, FFmpeg worker).
 
