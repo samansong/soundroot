@@ -163,6 +163,7 @@ function AccountMenu({ actor }: { actor: Actor }) {
               Start selling beats
             </button>
           )}
+          <Link className="pop-item" href="/settings/email" onClick={() => setOpen(false)}>Email preferences</Link>
           <a className="pop-item" href="/api/v1/me/export">Export my data</a>
           <button className="pop-item" style={{ width: "100%", textAlign: "left", border: "none", cursor: "pointer", background: "none", color: "#ffb0b0" }} onClick={async () => { await api("/api/v1/auth/logout", { method: "POST" }); router.push("/"); router.refresh(); }}>
             <span className="row"><IconLogout width={16} />Sign out</span>

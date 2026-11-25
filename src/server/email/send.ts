@@ -5,6 +5,7 @@ import { one } from "../db.ts";
 import { enqueue, registerJob } from "../queue.ts";
 import { inviteEmail, notificationEmail, verifyEmail, welcomeEmail, type Rendered } from "./templates.ts";
 import { issueVerificationToken } from "./verification-token.ts";
+import { notificationEmailAllowed, prefsPath, prefsToken } from "./prefs.ts";
 
 const FROM = () => process.env.EMAIL_FROM || "SoundzRoot <notice@soundzroot.com>";
 const REPLY_TO = () => process.env.EMAIL_REPLY_TO || undefined;
@@ -33,7 +34,9 @@ function recipient(userId: string) {
   return (u ?? null) as { id: string; email: string; name: string } | null;
 }
 
-function render(job: Job): { to: string; mail: Rendered; key: string } | null {
+type Out = { to: string; mail: Rendered; key: string; unsubscribe?: string };
+
+function render(job: Job): Out | null {
   if (job.kind === "invite") return { to: job.to, mail: inviteEmail(job), key: job.key };
   const u = recipient(job.userId);
   if (!u) return null;
@@ -45,12 +48,19 @@ function render(job: Job): { to: string; mail: Rendered; key: string } | null {
     const key = link ? `${job.key}-${link.key}` : job.key;
     if (job.kind === "verify") return { to: u.email, mail: verifyEmail({ name: u.name, path: link!.path, expiresInHours: link!.expiresInHours }), key };
     const roles = (one("SELECT group_concat(role) r FROM user_roles WHERE user_id=?", u.id)?.r ?? "").split(",");
-    return { to: u.email, mail: welcomeEmail({ name: u.name, roles, verify: link }), key };
+    return { to: u.email, mail: welcomeEmail({ name: u.name, roles, verify: link, prefsPath: prefsPath(u.id) }), key };
   }
-  return { to: u.email, mail: notificationEmail({ name: u.name, type: job.type, title: job.title, body: job.body, link: job.link }), key: job.key };
+  // Respect the user's email preferences (checked at send time, so a change applies to queued mail too).
+  if (!notificationEmailAllowed(u.id, job.type)) return null;
+  return {
+    to: u.email,
+    mail: notificationEmail({ name: u.name, type: job.type, title: job.title, body: job.body, link: job.link, prefsPath: prefsPath(u.id) }),
+    key: job.key,
+    unsubscribe: `/api/v1/email/unsubscribe?token=${encodeURIComponent(prefsToken(u.id))}`,
+  };
 }
 
-export async function deliver(to: string, mail: Rendered, idempotencyKey: string) {
+export async function deliver(to: string, mail: Rendered, idempotencyKey: string, unsubscribePath?: string) {
   // Never send to reserved test domains (demo seed accounts use @soundroot.test).
   if (/\.(test|example|invalid|localhost)$/i.test(to.split("@")[1] ?? "")) return { skipped: "test address" };
   const key = process.env.RESEND_API_KEY;
@@ -61,7 +71,11 @@ export async function deliver(to: string, mail: Rendered, idempotencyKey: string
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", "Idempotency-Key": idempotencyKey.slice(0, 256) },
-    body: JSON.stringify({ from: FROM(), to: [to], reply_to: REPLY_TO(), subject: mail.subject, html: mail.html, text: mail.text }),
+    body: JSON.stringify({
+      from: FROM(), to: [to], reply_to: REPLY_TO(), subject: mail.subject, html: mail.html, text: mail.text,
+      // One-click unsubscribe (RFC 8058) for notification emails, shown by Gmail and Apple Mail.
+      headers: unsubscribePath ? { "List-Unsubscribe": `<${(process.env.APP_URL || "http://localhost:3000").replace(/\/$/, "")}${unsubscribePath}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } : undefined,
+    }),
   });
   if (!res.ok) {
     const detail = (await res.text()).slice(0, 300);
@@ -80,5 +94,5 @@ export async function deliver(to: string, mail: Rendered, idempotencyKey: string
 registerJob("send_email", async (job: Job) => {
   const r = render(job);
   if (!r) return;
-  await deliver(r.to, r.mail, r.key);
+  await deliver(r.to, r.mail, r.key, r.unsubscribe);
 });

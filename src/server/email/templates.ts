@@ -43,7 +43,7 @@ function pill(text: string, color: string) {
 }
 
 /** Page chrome shared by every email: preheader, wordmark, optional hero photo, glass card, footer. */
-function layout(o: { preheader: string; hero?: { img: string; alt: string }; body: string; footerNote: string }) {
+function layout(o: { preheader: string; hero?: { img: string; alt: string }; body: string; footerNote: string; prefsPath?: string }) {
   const hero = o.hero
     ? `<tr><td style="padding:0;"><img src="${abs(o.hero.img)}" width="600" alt="${esc(o.hero.alt)}" style="display:block;width:100%;max-width:600px;height:auto;border:0;border-radius:24px 24px 0 0;"></td></tr>`
     : `<tr><td style="padding:28px 0 6px;background:${C.ink1};border-radius:24px 24px 0 0;">${equalizer()}</td></tr>`;
@@ -75,7 +75,7 @@ function layout(o: { preheader: string; hero?: { img: string; alt: string }; bod
     </td></tr>
     <tr><td align="center" style="padding:30px 20px 0;font-family:${FONT};font-size:12px;line-height:19px;color:${C.muted};">
       ${equalizer([4, 8, 12, 6, 10, 14, 8, 5, 11, 7, 13, 6], [C.muted])}
-      <p style="margin:16px 0 6px;">${o.footerNote}</p>
+      <p style="margin:16px 0 6px;">${o.footerNote}${o.prefsPath ? ` <a href="${esc(abs(o.prefsPath))}" style="color:${C.text2};">Manage email preferences</a>` : ""}</p>
       <p style="margin:0;"><a href="${appUrl()}/beats" style="color:${C.text2};text-decoration:none;">Beats</a> &nbsp;·&nbsp; <a href="${appUrl()}/studios" style="color:${C.text2};text-decoration:none;">Studios</a> &nbsp;·&nbsp; <a href="${appUrl()}/projects" style="color:${C.text2};text-decoration:none;">Projects</a></p>
       <p style="margin:10px 0 0;">© ${new Date().getFullYear()} SoundzRoot · Accra, Ghana</p>
     </td></tr>
@@ -89,7 +89,7 @@ const p = (t: string, extra = "") => `<p style="margin:14px 0 0;font-size:16px;l
 
 // ---------------------------------------------------------------- Notifications (every in-app notification)
 
-export function notificationEmail(d: { name: string; type: string; title: string; body: string; link?: string | null }): Rendered {
+export function notificationEmail(d: { name: string; type: string; title: string; body: string; link?: string | null; prefsPath?: string }): Rendered {
   const k = KINDS[d.type] ?? { icon: "🎵", label: "Update", color: C.teal };
   const href = abs(d.link);
   const body = `
@@ -104,8 +104,8 @@ export function notificationEmail(d: { name: string; type: string; title: string
     ${p(`Or paste this link into your browser:<br><a href="${esc(href)}" style="color:${C.muted};word-break:break-all;">${esc(href)}</a>`, "font-size:13px;line-height:20px;")}`;
   return {
     subject: `${k.icon} ${d.title}`,
-    html: layout({ preheader: d.body || d.title, body, footerNote: "You're receiving this because of activity on your SoundzRoot account." }),
-    text: `${d.title}\n\nHi ${first(d.name)},\n\n${d.body}\n\nOpen: ${href}\n\n— SoundzRoot`,
+    html: layout({ preheader: d.body || d.title, body, footerNote: "You're receiving this because of activity on your SoundzRoot account.", prefsPath: d.prefsPath }),
+    text: `${d.title}\n\nHi ${first(d.name)},\n\n${d.body}\n\nOpen: ${href}\n\n— SoundzRoot${d.prefsPath ? `\n\nManage email preferences: ${abs(d.prefsPath)}` : ""}`,
   };
 }
 
@@ -134,7 +134,7 @@ const STEPS: Record<string, { icon: string; color: string; title: string; text: 
   ],
 };
 
-export function welcomeEmail(d: { name: string; roles: string[]; verify?: { path: string; expiresInHours: number } | null }): Rendered {
+export function welcomeEmail(d: { name: string; roles: string[]; verify?: { path: string; expiresInHours: number } | null; prefsPath?: string }): Rendered {
   const role = ["studio_owner", "beatmaker", "engineer", "artist"].find((r) => d.roles.includes(r)) ?? "artist";
   const steps = STEPS[role];
   const cta = { artist: ["Explore beats", "/beats"], beatmaker: ["Open your producer studio", "/producer"], studio_owner: ["Set up your studio", "/studio"], engineer: ["Open your sessions", "/studio"] }[role] as [string, string];
@@ -175,7 +175,7 @@ export function welcomeEmail(d: { name: string; roles: string[]; verify?: { path
     </tr></table>`;
   return {
     subject: `Welcome to SoundzRoot, ${first(d.name)} 🎶`,
-    html: layout({ preheader: "Your account is ready — here's how to get started.", hero: { img: "/email/welcome.jpg", alt: "A young listener lost in music" }, body, footerNote: "You're receiving this because you created a SoundzRoot account." }),
+    html: layout({ preheader: "Your account is ready — here's how to get started.", hero: { img: "/email/welcome.jpg", alt: "A young listener lost in music" }, body, footerNote: "You're receiving this because you created a SoundzRoot account.", prefsPath: d.prefsPath }),
     text: `Welcome to SoundzRoot, ${first(d.name)}!\n\n${d.verify ? `Confirm your email address: ${abs(d.verify.path)}\n(expires in ${d.verify.expiresInHours} hours)\n\n` : ""}${steps.map((s, i) => `${i + 1}. ${s.title} — ${s.text} ${abs(s.href)}`).join("\n")}\n\n${cta[0]}: ${abs(cta[1])}\n\n— SoundzRoot`,
   };
 }

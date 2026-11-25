@@ -253,3 +253,32 @@ test("Email verification: sign-ups must confirm their email before money actions
   assert.ok(one("SELECT 1 FROM audit_events WHERE action='user.email_verified' AND resource_id=?", userId));
   assert.deepEqual(identity.resendVerification(a), { alreadyVerified: true });
 });
+
+test("Email preferences: categories can be switched off; account and safety emails always go out", async () => {
+  const prefs = await import("../src/server/email/prefs.ts");
+  const u = mk("prefs@soundroot.test", ["artist", "beatmaker"]);
+  // Everything on by default.
+  assert.deepEqual(prefs.getEmailPrefs(u.id), { all: true, sales: true, orders: true, bookings: true, projects: true });
+  assert.equal(prefs.notificationEmailAllowed(u.id, "sale"), true);
+  // Turn one category off.
+  prefs.setEmailPrefs(u.id, { sales: false });
+  assert.equal(prefs.notificationEmailAllowed(u.id, "sale"), false);
+  assert.equal(prefs.notificationEmailAllowed(u.id, "payout"), false);
+  assert.equal(prefs.notificationEmailAllowed(u.id, "order"), true);
+  // Master switch off silences every optional category, but not disputes or moderation.
+  prefs.setEmailPrefs(u.id, { all: false });
+  for (const k of ["order", "payment", "booking", "project", "message"]) assert.equal(prefs.notificationEmailAllowed(u.id, k), false, k);
+  for (const k of ["dispute", "moderation", "finance"]) assert.equal(prefs.notificationEmailAllowed(u.id, k), true, k);
+  // Back on restores the per-category choices.
+  prefs.setEmailPrefs(u.id, { all: true });
+  assert.equal(prefs.notificationEmailAllowed(u.id, "booking"), true);
+  assert.equal(prefs.notificationEmailAllowed(u.id, "sale"), false);
+  // Unknown keys are rejected.
+  assert.throws(() => prefs.setEmailPrefs(u.id, { marketing: false }));
+  // Signed email links identify the user; tampered ones don't.
+  const t = prefs.prefsToken(u.id);
+  assert.equal(prefs.userFromPrefsToken(t)?.id, u.id);
+  assert.equal(prefs.userFromPrefsToken(t.slice(0, -1) + (t.endsWith("A") ? "B" : "A")), null);
+  assert.equal(prefs.userFromPrefsToken(`${mk("other@soundroot.test", ["artist"]).id}.${t.split(".")[1]}`), null);
+  assert.equal(prefs.userFromPrefsToken("garbage"), null);
+});

@@ -427,3 +427,12 @@ CREATE TABLE IF NOT EXISTS email_verifications (
   created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS email_verifications_user ON email_verifications(user_id, created_at);
+
+-- Per-category email opt-outs. No row = email on. In-app notifications are never affected.
+CREATE TABLE IF NOT EXISTS email_prefs (
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  category TEXT NOT NULL,
+  enabled INTEGER NOT NULL,
+  updated_at TEXT NOT NULL,
+  PRIMARY KEY (user_id, category)
+);

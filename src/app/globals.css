@@ -529,3 +529,12 @@ p { margin: 0; }
 .verify-badge { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-size: 2rem; font-weight: 800; }
 .verify-badge.ok { background: radial-gradient(circle at 35% 30%, #a5f2e2, var(--teal)); color: #04211b; box-shadow: 0 0 60px rgba(63, 209, 179, 0.45); }
 .verify-badge.bad { background: radial-gradient(circle at 35% 30%, #ffd27a, var(--clay)); color: #2a0f05; box-shadow: 0 0 60px rgba(231, 119, 79, 0.4); }
+
+/* ---------- Settings */
+.pref-row { display: flex; align-items: center; gap: 18px; padding: 16px 18px; }
+.pref-master { padding: 20px 22px; }
+.switch { position: relative; width: 52px; height: 30px; flex: none; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(255, 255, 255, 0.08); cursor: pointer; transition: background 0.25s, border-color 0.25s; padding: 0; }
+.switch .knob { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #e8efed; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); transition: transform 0.25s cubic-bezier(0.3, 0.7, 0.3, 1.2); }
+.switch.on { background: linear-gradient(135deg, var(--teal-2), var(--teal)); border-color: transparent; }
+.switch.on .knob { transform: translateX(22px); }
+.switch:disabled { cursor: not-allowed; }
