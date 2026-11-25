@@ -41,23 +41,6 @@ export default async function Home() {
         {featured && <HeroPlayer beat={featured} />}
       </section>
 
-      <section className="scenes">
-        {[
-          { img: "/images/scene-rooftop.jpg", k: "Listen", t: "Find the sound that moves you", href: "/beats", pos: "center" },
-          { img: "/images/scene-producer.jpg", k: "Create", t: "Sell your beats with clear licenses", href: actor ? "/producer" : "/signup", pos: "68% center" },
-          { img: "/images/scene-vocalist.jpg", k: "Record", t: "Book a room, deliver the master", href: "/studios", pos: "42% center" },
-        ].map((c, i) => (
-          <Link key={c.k} href={c.href} className="scene-card fade-up" style={{ animationDelay: `${120 + i * 90}ms` }}>
-            <Image src={c.img} alt="" fill sizes="(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 440px" className="scene-photo" style={{ objectPosition: c.pos }} />
-            <div className="glass-pane scene-caption">
-              <div className="eyebrow">{c.k}</div>
-              <div className="scene-title">{c.t}</div>
-              <span className="scene-go" aria-hidden><IconArrow width={16} /></span>
-            </div>
-          </Link>
-        ))}
-      </section>
-
       <div className="marquee" aria-hidden>
         <div className="marquee-track">{[...genres, ...genres].map((g, i) => <span key={i}>{g}</span>)}</div>
       </div>

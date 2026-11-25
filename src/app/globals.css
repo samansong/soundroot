@@ -513,25 +513,6 @@ p { margin: 0; }
 .hp-spectrum { width: 84px; height: 40px; }
 @keyframes hero-drift { from { transform: scale(1.04) translate3d(0, 0, 0); } to { transform: scale(1.1) translate3d(-1.2%, -0.8%, 0); } }
 
-/* ---------- Scene cards */
-.scenes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.scene-card {
-  position: relative; isolation: isolate; overflow: hidden; border-radius: 26px; aspect-ratio: 4 / 5;
-  display: flex; align-items: flex-end; padding: 14px; border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 30px 80px -40px rgba(0, 0, 0, 0.9);
-}
-.scene-card::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, rgba(7, 13, 16, 0.55), transparent 45%); }
-.scene-photo { object-fit: cover; z-index: -2; transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1); }
-.scene-card:hover .scene-photo { transform: scale(1.06); }
-.scene-caption { position: relative; width: 100%; padding: 16px 56px 16px 18px; border-radius: 18px; }
-.scene-title { font-family: var(--font-display); font-weight: 650; font-size: 1.12rem; line-height: 1.25; margin-top: 6px; }
-.scene-go {
-  position: absolute; right: 14px; top: 50%; translate: 0 -50%; width: 34px; height: 34px; border-radius: 50%;
-  display: grid; place-items: center; background: rgba(255, 255, 255, 0.16); border: 1px solid rgba(255, 255, 255, 0.24); transition: background 0.3s, transform 0.3s;
-}
-.scene-card:hover .scene-go { background: var(--gold); color: #1b1305; transform: translateX(3px); }
-
-@media (max-width: 1100px) { .scenes { grid-template-columns: repeat(2, minmax(0, 1fr)); } .scenes .scene-card:last-child { grid-column: span 2; aspect-ratio: 16 / 9; } }
 @media (max-width: 900px) {
   .hero-stage { min-height: auto; align-items: end; padding: 28px 22px 22px; border-radius: 26px; }
   .hero-photo { inset: 0 0 auto 0 !important; height: 380px !important; object-position: 74% 30%; }
@@ -539,5 +520,4 @@ p { margin: 0; }
   .hero-copy { padding-top: 250px; }
   .hero-player { position: relative; right: auto; bottom: auto; width: 100%; margin-top: 18px; }
 }
-@media (max-width: 680px) { .scenes { grid-template-columns: 1fr; } .scenes .scene-card:last-child { grid-column: auto; aspect-ratio: 4 / 5; } }
 @media (prefers-reduced-motion: reduce) { .hero-photo { animation: none; } }
